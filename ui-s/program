@@ -1,0 +1,3536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>UI's Editor</title>
+<style>
+
+/* ===============================
+   けいふぉんと
+   =============================== */
+
+@font-face {
+  font-family: "Keifont.ttf";
+  src: url("./Keifont.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ===============================
+   Color Settings
+   =============================== */
+
+:root{
+  --accent:#3559E0;
+  --accent-dark:#233C99;
+
+  --topbar:#84cae3;
+  --topbar-dark:#5fa9c9;
+  --accent-soft:#E4EAFF;
+
+  --panel-bg:#F1F3F8;
+  --panel-border:#D8DCE6;
+
+  --ink:#1A1D29;
+  --ink-soft:#6B7080;
+
+  --canvas-bg:#E7EAF1;
+  --page-bg:#FFFFFF;
+
+  --danger:#E0473E;
+  --danger-soft:#FCE4E2;
+
+  --ui-font:"KeiFont", sans-serif;
+}
+
+
+/* ===============================
+   Reset
+   =============================== */
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  height:100%;
+  margin:0;
+}
+
+body{
+  font-family:var(--ui-font);
+  color:var(--ink);
+
+  -webkit-user-select:none;
+  user-select:none;
+
+  overflow:hidden;
+}
+
+button,
+input,
+select,
+textarea{
+  font-family:var(--ui-font);
+}
+
+
+/* ===============================
+   App
+   =============================== */
+
+#app{
+  display:flex;
+  flex-direction:column;
+
+  height:100vh;
+
+  background:var(--canvas-bg);
+}
+
+
+/* ===============================
+   Top Bar
+   =============================== */
+
+.topbar{
+  height:58px;
+  flex:0 0 auto;
+
+  background:var(--topbar);
+
+  display:flex;
+  align-items:center;
+
+  gap:10px;
+  padding:0 14px;
+
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+
+  position:relative;
+  z-index:50;
+}
+
+
+/* Logo */
+
+.logo{
+  color:#fff;
+
+  font-family:var(--ui-font);
+  font-weight:800;
+  font-size:18px;
+
+  letter-spacing:.5px;
+
+  padding:6px 12px;
+}
+
+
+/* Top buttons */
+
+.pill-btn{
+  font-family:var(--ui-font);
+
+  background:#fff;
+  color:var(--ink);
+
+  border:none;
+  border-radius:9px;
+
+  padding:9px 16px;
+
+  font-size:14px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  box-shadow:0 1px 2px rgba(0,0,0,.12);
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+.pill-btn:hover{
+  transform:translateY(-1px);
+
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.18);
+}
+
+.pill-btn:active{
+  transform:translateY(0);
+}
+
+
+/* ===============================
+   Dropdown
+   =============================== */
+
+.dropdown-wrap{
+  position:relative;
+}
+
+.dropdown{
+  position:absolute;
+
+  top:calc(100% + 8px);
+  left:0;
+
+  background:#fff;
+
+  border-radius:10px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.22);
+
+  padding:6px;
+
+  min-width:200px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:2px;
+
+  z-index:60;
+}
+
+.dropdown button,
+.dropdown label{
+  font-family:var(--ui-font);
+
+  background:none;
+
+  border:none;
+
+  text-align:left;
+
+  padding:10px 12px;
+
+  border-radius:7px;
+
+  font-size:13.5px;
+  font-weight:600;
+
+  color:var(--ink);
+
+  cursor:pointer;
+
+  display:block;
+
+  width:100%;
+}
+
+.dropdown button:hover,
+.dropdown label:hover{
+  background:var(--accent-soft);
+}
+
+.dropdown select{
+  font-family:var(--ui-font);
+
+  width:100%;
+
+  padding:8px;
+
+  border-radius:7px;
+
+  border:
+    1px solid var(--panel-border);
+
+  font-size:13px;
+
+  margin-top:4px;
+}
+
+.dropdown .section-title{
+  font-family:var(--ui-font);
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+
+  padding:6px 12px 0;
+
+  font-weight:700;
+
+  text-transform:uppercase;
+
+  letter-spacing:.4px;
+}
+
+.dropdown .section-note{
+  font-family:var(--ui-font);
+
+  font-size:11px;
+
+  line-height:1.5;
+
+  color:var(--ink-soft);
+
+  padding:6px 12px 8px;
+}
+
+
+/* ===============================
+   Filename Box
+   =============================== */
+
+.filename-box{
+  margin-left:auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:6px;
+
+  background:#fff;
+
+  border-radius:9px;
+
+  padding:6px 10px 6px 14px;
+
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.12);
+}
+
+.filename-box input{
+  font-family:var(--ui-font);
+
+  border:none;
+
+  outline:none;
+
+  font-weight:700;
+
+  font-size:14px;
+
+  width:130px;
+
+  color:var(--ink);
+
+  background:transparent;
+}
+
+
+/* Icon button */
+
+.icon-btn{
+  width:28px;
+  height:28px;
+
+  border-radius:6px;
+
+  border:none;
+
+  background:var(--accent-soft);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:var(--accent-dark);
+}
+
+.icon-btn:hover{
+  background:var(--accent);
+
+  color:#fff;
+}
+
+
+/* ===============================
+   Page Nav (quick prev/next in topbar)
+   =============================== */
+
+.page-nav{
+  display:flex;
+  align-items:center;
+  gap:4px;
+
+  background:#fff;
+
+  border-radius:9px;
+
+  padding:4px;
+
+  box-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+
+.page-nav-btn{
+  font-family:var(--ui-font);
+
+  width:26px;
+  height:26px;
+
+  border:none;
+
+  border-radius:6px;
+
+  background:var(--accent-soft);
+
+  color:var(--accent-dark);
+
+  font-weight:800;
+
+  font-size:13px;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.page-nav-btn:hover{
+  background:var(--accent);
+  color:#fff;
+}
+
+.page-nav-label{
+  font-family:var(--ui-font);
+
+  font-size:12.5px;
+  font-weight:700;
+
+  color:var(--ink);
+
+  padding:0 4px;
+
+  max-width:120px;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+/* ===============================
+   Main Layout
+   =============================== */
+
+.main{
+  flex:1;
+
+  display:flex;
+
+  overflow:hidden;
+
+  position:relative;
+}
+
+
+/* ===============================
+   Left Tool Dock
+   =============================== */
+
+.dock-toggle{
+  position:absolute;
+
+  top:16px;
+  left:16px;
+
+  z-index:30;
+
+  width:40px;
+  height:40px;
+
+  border-radius:10px;
+
+  background:var(--ink);
+
+  color:#fff;
+
+  border:none;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  font-family:var(--ui-font);
+  font-size:18px;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.25);
+
+  transition:
+    left .18s ease,
+    background .12s ease;
+}
+
+.dock-toggle:hover{
+  background:#000;
+}
+
+
+.toolpanel{
+  position:absolute;
+
+  top:16px;
+  left:16px;
+
+  z-index:25;
+
+  background:var(--panel-bg);
+
+  border:
+    1px solid var(--panel-border);
+
+  border-radius:14px;
+
+  padding:56px 12px 14px;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.16);
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:8px;
+
+  width:172px;
+
+  transform:translateX(-220px);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    all .18s ease;
+}
+
+.toolpanel.open{
+  transform:translateX(0);
+
+  opacity:1;
+
+  pointer-events:auto;
+}
+
+
+/* Tool Buttons */
+
+.tool-btn{
+  font-family:var(--ui-font);
+
+  background:#fff;
+
+  border:
+    1px solid var(--panel-border);
+
+  border-radius:10px;
+
+  padding:10px 4px 8px;
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+
+  gap:4px;
+
+  cursor:pointer;
+
+  font-size:11.5px;
+
+  font-weight:600;
+
+  color:var(--ink);
+}
+
+.tool-btn svg{
+  width:26px;
+  height:26px;
+}
+
+.tool-btn:hover{
+  border-color:var(--accent);
+}
+
+.tool-btn.active{
+  background:var(--accent);
+
+  color:#fff;
+
+  border-color:var(--accent);
+}
+
+.tool-btn.active svg *{
+  stroke:#fff !important;
+
+  fill:#fff !important;
+}
+
+
+/* ===============================
+   Canvas
+   =============================== */
+
+.canvas-wrap{
+  flex:1;
+
+  overflow:auto;
+
+  position:relative;
+
+  padding:48px 48px 160px;
+}
+
+.artboard-shell{
+  position:relative;
+
+  box-shadow:
+    0 12px 40px rgba(0,0,0,.18);
+
+  border-radius:4px;
+
+  /* margin:auto centers the artboard horizontally when it's smaller than
+     the viewport, and collapses to 0 (flush-left, normal block flow) once
+     the artboard is wider than the viewport -- so both the left and right
+     edges stay reachable via the wrap's horizontal scrollbar. Combined
+     with overflow:auto on the wrap, this also guarantees a working
+     vertical scrollbar all the way down to the height-extend handle. */
+  margin:0 auto;
+}
+
+.artboard{
+  display:block;
+
+  background:var(--page-bg);
+
+  border-radius:4px;
+}
+
+
+/* Canvas extend handle (drag to lengthen the page below the device size) */
+
+.canvas-extend-handle{
+  position:absolute;
+
+  bottom:0;
+  left:50%;
+
+  transform:translate(-50%, 50%);
+
+  z-index:20;
+
+  width:40px;
+  height:26px;
+
+  border-radius:13px;
+
+  background:var(--ink);
+
+  color:#fff;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:ns-resize;
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,.28);
+
+  touch-action:none;
+}
+
+.canvas-extend-handle:hover{
+  background:var(--accent);
+}
+
+.canvas-extend-handle svg{
+  pointer-events:none;
+}
+
+
+/* Tool Hint */
+
+.tool-hint{
+  font-family:var(--ui-font);
+
+  position:absolute;
+
+  bottom:14px;
+
+  left:50%;
+
+  transform:
+    translateX(-50%);
+
+  background:
+    rgba(26,29,41,.82);
+
+  color:#fff;
+
+  font-size:12.5px;
+
+  font-weight:600;
+
+  padding:7px 14px;
+
+  border-radius:20px;
+
+  white-space:nowrap;
+
+  pointer-events:none;
+
+  z-index:15;
+}
+
+
+/* ===============================
+   Right Panel
+   =============================== */
+
+.right-panel{
+  position:absolute;
+
+  top:16px;
+  right:16px;
+  bottom:16px;
+
+  width:230px;
+
+  z-index:25;
+
+  background:var(--panel-bg);
+
+  border:
+    1px solid var(--panel-border);
+
+  border-radius:14px;
+
+  padding:12px;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.16);
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:12px;
+
+  overflow-y:auto;
+
+  transform:
+    translateX(260px);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    all .18s ease;
+}
+
+.right-panel.open{
+  transform:
+    translateX(0);
+
+  opacity:1;
+
+  pointer-events:auto;
+}
+
+
+/* Right panel tabs */
+
+.panel-tabs{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:6px;
+
+  background:#fff;
+
+  border:1px solid var(--panel-border);
+
+  border-radius:9px;
+
+  padding:3px;
+}
+
+.panel-tab-btn{
+  font-family:var(--ui-font);
+
+  background:none;
+
+  border:none;
+
+  border-radius:7px;
+
+  padding:8px 4px;
+
+  font-size:12.5px;
+
+  font-weight:700;
+
+  color:var(--ink-soft);
+
+  cursor:pointer;
+}
+
+.panel-tab-btn.active{
+  background:var(--accent);
+
+  color:#fff;
+}
+
+.panel-tab-content{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:12px;
+}
+
+.panel-tab-content.hidden{
+  display:none;
+}
+
+
+/* Panel Title */
+
+.panel-title{
+  font-family:var(--ui-font);
+
+  font-size:15px;
+
+  font-weight:800;
+
+  background:#fff;
+
+  border:
+    1px solid var(--panel-border);
+
+  border-radius:9px;
+
+  padding:10px;
+
+  text-align:center;
+
+  cursor:pointer;
+}
+
+.panel-title.on{
+  background:var(--accent);
+
+  color:#fff;
+
+  border-color:var(--accent);
+}
+
+
+.panel-hint{
+  font-family:var(--ui-font);
+
+  font-size:11px;
+
+  color:var(--ink-soft);
+
+  margin-top:-8px;
+
+  line-height:1.4;
+}
+
+
+/* Text edit */
+
+.text-edit-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.text-edit-area{
+  width:100%;
+
+  border:1px solid var(--panel-border);
+
+  border-radius:8px;
+
+  padding:8px;
+
+  font-family:var(--ui-font);
+
+  font-size:13px;
+
+  color:var(--ink);
+
+  resize:vertical;
+
+  outline:none;
+}
+
+.text-edit-area:focus{
+  border-color:var(--accent);
+}
+
+
+/* Panel Buttons */
+
+.btn-row{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:8px;
+}
+
+.panel-btn{
+  font-family:var(--ui-font);
+
+  background:#fff;
+
+  border:
+    1px solid var(--panel-border);
+
+  border-radius:9px;
+
+  padding:9px 4px;
+
+  font-size:12.5px;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  color:var(--ink);
+}
+
+.panel-btn:hover{
+  border-color:var(--accent);
+
+  color:var(--accent-dark);
+}
+
+
+/* ===============================
+   Color Controls (RGBA)
+   =============================== */
+
+.color-label{
+  font-family:var(--ui-font);
+
+  font-size:14px;
+
+  font-weight:800;
+
+  margin-top:2px;
+}
+
+.color-block{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:7px;
+
+  background:#fff;
+
+  border:1px solid var(--panel-border);
+
+  border-radius:10px;
+
+  padding:10px;
+}
+
+.slider-row{
+  display:grid;
+
+  grid-template-columns:14px 1fr 30px;
+
+  align-items:center;
+
+  gap:8px;
+
+  font-family:var(--ui-font);
+
+  font-size:12px;
+
+  font-weight:700;
+}
+
+.slider-row span.slider-tag{
+  color:var(--ink-soft);
+  text-align:center;
+}
+
+.slider-row span.slider-value{
+  color:var(--ink);
+
+  text-align:right;
+
+  font-variant-numeric:tabular-nums;
+}
+
+.slider-row input[type="range"]{
+  width:100%;
+
+  accent-color:var(--accent);
+}
+
+
+.swatch{
+  width:100%;
+
+  height:36px;
+
+  border-radius:8px;
+
+  border:
+    1px solid var(--panel-border);
+
+  margin-top:2px;
+}
+
+
+/* Delete */
+
+.delete-btn{
+  font-family:var(--ui-font);
+
+  margin-top:auto;
+
+  background:var(--danger-soft);
+
+  color:var(--danger);
+
+  border:
+    1px solid transparent;
+
+  border-radius:9px;
+
+  padding:10px;
+
+  font-weight:800;
+
+  font-size:13px;
+
+  cursor:pointer;
+}
+
+.delete-btn:hover{
+  background:var(--danger);
+
+  color:#fff;
+}
+
+
+/* Link (button-ify) controls */
+
+.link-toggle-row{
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  font-family:var(--ui-font);
+
+  font-size:13px;
+
+  font-weight:700;
+
+  background:#fff;
+
+  border:1px solid var(--panel-border);
+
+  border-radius:9px;
+
+  padding:9px 10px;
+
+  cursor:pointer;
+}
+
+.link-toggle-row input[type="checkbox"]{
+  width:16px;
+  height:16px;
+
+  accent-color:var(--accent);
+
+  cursor:pointer;
+}
+
+
+/* ===============================
+   SVG
+   =============================== */
+
+svg.artboard{
+  cursor:default;
+}
+
+.shape-el{
+  cursor:move;
+}
+
+.handle{
+  fill:#fff;
+
+  stroke:var(--accent);
+
+  stroke-width:2;
+
+  cursor:pointer;
+}
+
+.sel-box{
+  fill:none;
+
+  stroke:var(--accent);
+
+  stroke-width:1.5;
+
+  stroke-dasharray:
+    4 3;
+
+  pointer-events:none;
+}
+
+.shape-preview{
+  fill:
+    rgba(53,89,224,.10);
+
+  stroke:
+    var(--accent);
+
+  stroke-width:1.6;
+
+  stroke-dasharray:
+    6 4;
+
+  pointer-events:none;
+}
+
+.rotate-line{
+  stroke:var(--accent);
+  stroke-width:1.5;
+  stroke-dasharray:3 3;
+  opacity:.7;
+  pointer-events:none;
+}
+
+.rotate-handle{
+  fill:var(--accent);
+  stroke:#fff;
+  stroke-width:2;
+  cursor:grab;
+}
+
+.snap-guide{
+  stroke:var(--danger);
+  stroke-width:1;
+  stroke-dasharray:5 4;
+  opacity:.85;
+  pointer-events:none;
+  vector-effect:non-scaling-stroke;
+}
+
+
+/* ===============================
+   Scrollbar
+   =============================== */
+
+::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#c3c8d4;
+
+  border-radius:4px;
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <div class="logo">UI's</div>
+
+    <div class="dropdown-wrap" id="fileWrap">
+      <button class="pill-btn" id="fileBtn" type="button">ファイル</button>
+      <div class="dropdown" id="fileMenu" style="display:none;">
+        <button id="pdfSaveBtn" type="button">PDF保存</button>
+        <button id="zipSaveBtn" type="button">zipで保存</button>
+        <button id="exportCodeBtn" type="button">コード出力（このページ）</button>
+        <button id="copyCodeBtn" type="button">コードをコピー</button>
+        <button id="exportAllPagesBtn" type="button">全ページを書き出し（zip）</button>
+        <label id="zipLoadLabel">zipを読み込み
+          <input type="file" id="zipLoadInput" accept=".zip" style="display:none;">
+        </label>
+      </div>
+    </div>
+
+    <button class="pill-btn" id="newBtn" type="button">新規</button>
+
+    <button class="pill-btn" id="undoBtn" type="button" title="元に戻す (Ctrl+Z)">↺</button>
+    <button class="pill-btn" id="redoBtn" type="button" title="やり直す (Ctrl+Y / Ctrl+Shift+Z)">↻</button>
+
+    <div class="dropdown-wrap" id="settingsWrap">
+      <button class="pill-btn" id="settingsBtn" type="button">設定</button>
+      <div class="dropdown" id="settingsMenu" style="display:none;">
+        <div class="section-title">ベース機種選択</div>
+        <select id="deviceSelect">
+          <option value="none">選択しない</option>
+          <option value="iphone15">iPhone 15 (390×844)</option>
+          <option value="ipadair">iPad Air (600×800)</option>
+          <option value="mbp12">MacBook Pro 12 (900×560)</option>
+          <option value="mbp14">MacBook Pro 14 (960×600)</option>
+          <option value="fhd">Full HD Desktop (960×540)</option>
+        </select>
+        <div class="section-note">幅は機種サイズのまま、キャンバス下端のハンドル（⇕）をドラッグすると高さだけ伸ばせます。縦に長いWebサイトの作成にご利用ください。</div>
+      </div>
+    </div>
+
+    <div class="dropdown-wrap" id="pagesWrap">
+      <button class="pill-btn" id="pagesBtn" type="button">ページ</button>
+      <div class="dropdown" id="pagesMenu" style="display:none;">
+        <div class="section-title">ページ一覧</div>
+        <div id="pagesList"></div>
+        <button id="addPageBtn" type="button">＋ 新しいページを追加</button>
+        <button id="deletePageBtn" type="button">このページを削除</button>
+        <div class="section-note">ページ名がそのままファイル名（例: home → home.html）になります。図形を選び、右パネルの「配置」タブでリンク先ページを指定すると、その図形がボタンになります。書き出したhtmlファイル同士は自動でページ移動バーが付きます。</div>
+      </div>
+    </div>
+
+    <div class="page-nav" id="pageNav" title="ページを素早く切り替え">
+      <button class="page-nav-btn" id="pagePrevBtn" type="button">◀</button>
+      <div class="page-nav-label" id="pageNavLabel">index</div>
+      <button class="page-nav-btn" id="pageNextBtn" type="button">▶</button>
+    </div>
+
+    <div class="filename-box">
+      <input type="text" id="filenameInput" value="index" disabled>
+      <button class="icon-btn" id="renameBtn" title="名前を変更" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 21l3.6-.9L20 6.7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0L2.9 16.4 2 21z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <button class="dock-toggle" id="dockToggle" type="button">→</button>
+    <div class="toolpanel" id="toolPanel">
+      <button class="dock-toggle" id="dockCloseInner" type="button" style="position:static;width:32px;height:32px;grid-column:1/3;justify-self:start;margin-bottom:2px;">↤</button>
+
+      <div class="tool-btn" data-tool="select">
+        <svg viewBox="0 0 24 24"><path d="M5 3l14 6-6 2-2 6-6-14z" fill="none" stroke="#1A1D29" stroke-width="2" stroke-linejoin="round"/></svg>
+        選択
+      </div>
+      <div class="tool-btn" data-tool="rect">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" fill="none" stroke="#1A1D29" stroke-width="2"/></svg>
+        四角形
+      </div>
+      <div class="tool-btn" data-tool="triangle">
+        <svg viewBox="0 0 24 24"><polygon points="12,3 21,21 3,21" fill="none" stroke="#1A1D29" stroke-width="2"/></svg>
+        三角形
+      </div>
+      <div class="tool-btn" data-tool="circle">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#1A1D29" stroke-width="2"/></svg>
+        円
+      </div>
+      <div class="tool-btn" data-tool="text">
+        <svg viewBox="0 0 24 24"><text x="6" y="18" font-size="18" font-weight="700" fill="#1A1D29">T</text></svg>
+        テキスト
+      </div>
+      <div class="tool-btn" data-tool="pen">
+        <svg viewBox="0 0 24 24"><path d="M4 20l1-4 11-11 3 3-11 11z" fill="none" stroke="#1A1D29" stroke-width="2" stroke-linejoin="round"/></svg>
+        ペン
+      </div>
+      <div class="tool-btn" data-tool="image">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="#1A1D29" stroke-width="2"/><circle cx="8.5" cy="9.5" r="1.6" fill="#1A1D29"/><path d="M4 17l5-5 4 4 3-3 4 4" fill="none" stroke="#1A1D29" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        画像
+      </div>
+      <div class="tool-btn" data-tool="eraser">
+        <svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="10" fill="none" stroke="#1A1D29" stroke-width="2"/></svg>
+        消しゴム
+      </div>
+    </div>
+    <input type="file" id="imageUploadInput" accept="image/*" style="display:none;">
+
+    <div class="canvas-wrap" id="canvasWrap">
+      <div class="artboard-shell" id="artboardShell">
+        <svg class="artboard" id="artboard" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="canvas-extend-handle" id="canvasExtendHandle" title="ドラッグしてページを下に伸ばせます（ダブルクリックで機種サイズに戻す）">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="tool-hint" id="toolHint"></div>
+    </div>
+
+    <div class="right-panel" id="rightPanel">
+
+      <div class="panel-tabs">
+        <button class="panel-tab-btn active" id="tabStyleBtn" type="button">スタイル</button>
+        <button class="panel-tab-btn" id="tabLayoutBtn" type="button">配置とリンク</button>
+      </div>
+
+      <!-- ============ スタイルタブ ============ -->
+      <div class="panel-tab-content" id="tabStyleContent">
+
+        <div class="panel-title" id="transformToggle">変形させる</div>
+        <div class="panel-hint" id="transformHint"></div>
+
+        <div class="text-edit-wrap" id="textEditWrap" style="display:none;">
+          <div class="color-label" id="textContentLabel">テキスト内容</div>
+          <textarea id="textEditArea" class="text-edit-area" rows="3"></textarea>
+          <div class="color-label" style="margin-top:6px;" id="fontSizeLabel">文字サイズ</div>
+          <div class="slider-row"><span class="slider-tag">Aa</span><input type="range" id="fontSizeSlider" min="10" max="160"><span class="slider-value" id="fontSizeValue">0</span></div>
+        </div>
+
+        <div class="text-edit-wrap" id="radiusEditWrap" style="display:none;">
+          <div class="color-label" id="radiusLabel">角の丸み</div>
+          <div class="slider-row"><span class="slider-tag">◲</span><input type="range" id="radiusSlider" min="0" max="100"><span class="slider-value" id="radiusValue">0</span></div>
+        </div>
+
+        <div class="text-edit-wrap" id="imageEditWrap" style="display:none;">
+          <button class="panel-btn" id="replaceImageBtn" type="button" style="width:100%;">画像を差し替え</button>
+        </div>
+
+        <div id="colorControls">
+          <div class="color-label">色（RGBA）</div>
+          <div class="color-block">
+            <div class="swatch" id="colorSwatch"></div>
+            <div class="slider-row"><span class="slider-tag">R</span><input type="range" id="rSlider" min="0" max="255"><span class="slider-value" id="rValue">0</span></div>
+            <div class="slider-row"><span class="slider-tag">G</span><input type="range" id="gSlider" min="0" max="255"><span class="slider-value" id="gValue">0</span></div>
+            <div class="slider-row"><span class="slider-tag">B</span><input type="range" id="bSlider" min="0" max="255"><span class="slider-value" id="bValue">0</span></div>
+            <div class="slider-row"><span class="slider-tag">A</span><input type="range" id="aSlider" min="0" max="100"><span class="slider-value" id="aValue">0</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============ 配置とリンクタブ ============ -->
+      <div class="panel-tab-content hidden" id="tabLayoutContent">
+
+        <div class="color-label">重なり順</div>
+        <div class="btn-row">
+          <button class="panel-btn" id="frontBtn" type="button">前面</button>
+          <button class="panel-btn" id="backBtn" type="button">背面</button>
+          <button class="panel-btn" id="frontMostBtn" type="button">最前面</button>
+          <button class="panel-btn" id="backMostBtn" type="button">最背面</button>
+        </div>
+
+        <div class="color-label">リンク（ボタン化）</div>
+        <label class="link-toggle-row">
+          <input type="checkbox" id="linkEnableCheckbox">
+          この図形をボタンにする
+        </label>
+        <div class="text-edit-wrap" id="linkEditWrap" style="display:none;">
+          <div class="color-label">リンク先ページ</div>
+          <select id="linkTargetSelect"></select>
+        </div>
+
+        <button class="delete-btn" id="deleteBtn" type="button">この図形を削除</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/* ================= State ================= */
+let shapes = [];
+let idCounter = 0;
+let selectedId = null;
+let currentTool = "select";
+let transformMode = false;
+let filename = "index";
+let activeRightTab = "style"; // "style" | "layout"
+
+/* `foldY` marks the height of the originally-selected device preset.
+   The artboard can be dragged taller than this (via the extend handle)
+   so vertical/long web pages can be authored while keeping the chosen
+   device width. `foldY` is null when no device preset is active. */
+let canvas = { w: 900, h: 600, foldY: null };
+
+const DEVICE_PRESETS = {
+  none:    null,
+  iphone15:{w:390,h:844},
+  ipadair: {w:600,h:800},
+  mbp12:   {w:900,h:560},
+  mbp14:   {w:960,h:600},
+  fhd:     {w:960,h:540},
+};
+
+const MIN_CANVAS_H = 100;
+
+const DEFAULT_SHAPE_COLOR = {r:76,g:111,b:255,a:1};
+const DEFAULT_TEXT_COLOR  = {r:26,g:29,b:41,a:1};
+const DEFAULT_PEN_COLOR   = {r:26,g:29,b:41,a:1};
+const DEFAULT_BUTTON_COLOR= {r:53,g:89,b:224,a:1}; // kept for migrating old "button" shapes
+
+const POINT_TYPES = ['rect','triangle','path']; // shapes represented as an editable points array
+const MAX_CORNER_RADIUS = 100; // clamp for the corner-radius slider (also clamped to half the min side at render time)
+
+/* ---- Multi-page state ---------------------------------------------
+   Each page is its own little site/screen: {id, name, canvas, shapes}.
+   `name` doubles as the exported filename (name + ".html"), so ANY
+   shape can link to another page by storing that page's name in its
+   `linkTo` field (see "リンク（ボタン化）" in the right panel — no
+   special "button" shape type is needed, a plain rectangle, circle,
+   text, etc. can all become a clickable link). Only the *current*
+   page's shapes/canvas/filename are kept "live" in the top-level
+   variables above; syncCurrentPageIntoPages() copies the live state
+   back into `pages` before switching/saving. */
+let pages = [{ id: 1, name: 'index', canvas: { w:900, h:600, foldY:null }, shapes: [] }];
+let currentPageId = 1;
+let pageIdCounter = 1;
+let pendingImagePos = null; // set right before the image-upload file picker opens
+
+/* ---- Undo / Redo history (whole-state snapshots) ---- */
+let undoStack = [];
+let redoStack = [];
+const HISTORY_LIMIT = 100;
+
+/* ---- Copy / paste clipboard (in-memory, editor-local) ---- */
+let clipboardShape = null;
+let clipboardPasteCount = 0;
+
+/* ================= DOM refs ================= */
+const artboard = document.getElementById('artboard');
+const artboardShell = document.getElementById('artboardShell');
+const canvasExtendHandle = document.getElementById('canvasExtendHandle');
+const dockToggle = document.getElementById('dockToggle');
+const dockCloseInner = document.getElementById('dockCloseInner');
+const toolPanel = document.getElementById('toolPanel');
+const rightPanel = document.getElementById('rightPanel');
+const filenameInput = document.getElementById('filenameInput');
+const renameBtn = document.getElementById('renameBtn');
+const toolHint = document.getElementById('toolHint');
+const transformHint = document.getElementById('transformHint');
+const textEditWrap = document.getElementById('textEditWrap');
+const textEditArea = document.getElementById('textEditArea');
+const fontSizeSlider = document.getElementById('fontSizeSlider');
+const fontSizeValue = document.getElementById('fontSizeValue');
+const radiusEditWrap = document.getElementById('radiusEditWrap');
+const radiusSlider = document.getElementById('radiusSlider');
+const radiusValue = document.getElementById('radiusValue');
+const linkEnableCheckbox = document.getElementById('linkEnableCheckbox');
+const linkEditWrap = document.getElementById('linkEditWrap');
+const linkTargetSelect = document.getElementById('linkTargetSelect');
+const imageEditWrap = document.getElementById('imageEditWrap');
+const colorControls = document.getElementById('colorControls');
+const imageUploadInput = document.getElementById('imageUploadInput');
+const pagesList = document.getElementById('pagesList');
+const pageNavLabel = document.getElementById('pageNavLabel');
+
+/* ================= Utility ================= */
+function uid(){ return ++idCounter; }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function rgba(c){ return `rgba(${c.r},${c.g},${c.b},${c.a})`; }
+
+function rotatePoint(px, py, cx, cy, angleDeg){
+  const rad = angleDeg * Math.PI / 180;
+  const cos = Math.cos(rad), sin = Math.sin(rad);
+  const dx = px - cx, dy = py - cy;
+  return { x: cx + dx*cos - dy*sin, y: cy + dx*sin + dy*cos };
+}
+
+function pathBBox(points){
+  const xs = points.map(p=>p.x), ys = points.map(p=>p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  return {x:minX, y:minY, w:Math.max(maxX-minX,2), h:Math.max(maxY-minY,2)};
+}
+function getBBox(shape){
+  if(POINT_TYPES.includes(shape.type)) return pathBBox(shape.points);
+  return {x:shape.x, y:shape.y, w:shape.w, h:shape.h};
+}
+function getSelected(){ return shapes.find(s=>s.id===selectedId); }
+
+function applyShapeTransform(el, shape){
+  const rot = shape.rotation || 0;
+  if(rot){
+    const box = getBBox(shape);
+    const cx = box.x+box.w/2, cy = box.y+box.h/2;
+    el.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
+  } else {
+    el.removeAttribute('transform');
+  }
+}
+
+/* Is this 4-point "rect" shape currently an axis-aligned rectangle?
+   (Free vertex-dragging in 変形 mode can distort it into an arbitrary
+   quadrilateral — in that case we can't draw rounded corners, so we
+   fall back to a plain straight-edged path.) */
+function isAxisAlignedRect(points){
+  if(!points || points.length!==4) return false;
+  const [p0,p1,p2,p3] = points;
+  const eps = 0.5;
+  return Math.abs(p0.y-p1.y)<eps && Math.abs(p1.x-p2.x)<eps &&
+         Math.abs(p2.y-p3.y)<eps && Math.abs(p3.x-p0.x)<eps;
+}
+
+/* Builds the 'd' attribute for a rect shape. Rounded corners are drawn
+   whenever the shape is still a plain axis-aligned rectangle and has a
+   cornerRadius > 0; otherwise we fall back to a straight-edged path
+   equivalent to the old <polygon>. Always returning a <path> 'd' string
+   (rather than switching between <rect>/<polygon> elements) means the
+   same function can be used both for the initial render() and for the
+   lightweight in-place updateShapeDom() calls used during drag. */
+function buildRectPathD(shape){
+  const pts = shape.points;
+  const radius = shape.cornerRadius || 0;
+  if(radius > 0 && isAxisAlignedRect(pts)){
+    const box = pathBBox(pts);
+    const r = Math.max(0, Math.min(radius, box.w/2, box.h/2));
+    const {x,y,w,h} = box;
+    if(r < 0.5){
+      return `M${x},${y} L${x+w},${y} L${x+w},${y+h} L${x},${y+h} Z`;
+    }
+    return [
+      `M${x+r},${y}`,
+      `L${x+w-r},${y}`,
+      `A${r},${r} 0 0 1 ${x+w},${y+r}`,
+      `L${x+w},${y+h-r}`,
+      `A${r},${r} 0 0 1 ${x+w-r},${y+h}`,
+      `L${x+r},${y+h}`,
+      `A${r},${r} 0 0 1 ${x},${y+h-r}`,
+      `L${x},${y+r}`,
+      `A${r},${r} 0 0 1 ${x+r},${y}`,
+      'Z'
+    ].join(' ');
+  }
+  let d = '';
+  pts.forEach((p,i)=>{ d += (i===0?'M':'L') + p.x + ',' + p.y + ' '; });
+  return d + 'Z';
+}
+
+/* ================= Undo / Redo ================= */
+function snapshotState(){
+  return {
+    shapes: JSON.parse(JSON.stringify(shapes)),
+    canvas: JSON.parse(JSON.stringify(canvas)),
+    selectedId
+  };
+}
+function pushHistory(){
+  undoStack.push(snapshotState());
+  if(undoStack.length > HISTORY_LIMIT) undoStack.shift();
+  redoStack = [];
+}
+function restoreState(state){
+  shapes = JSON.parse(JSON.stringify(state.shapes));
+  canvas = JSON.parse(JSON.stringify(state.canvas));
+  selectedId = state.selectedId;
+  applyCanvasSize();
+  render();
+}
+function undo(){
+  if(undoStack.length===0) return;
+  const current = snapshotState();
+  const prev = undoStack.pop();
+  redoStack.push(current);
+  restoreState(prev);
+}
+function redo(){
+  if(redoStack.length===0) return;
+  const current = snapshotState();
+  const next = redoStack.pop();
+  undoStack.push(current);
+  restoreState(next);
+}
+
+/* ================= Copy / Paste ================= */
+function copySelected(){
+  const s = getSelected();
+  if(!s) return;
+  clipboardShape = JSON.parse(JSON.stringify(s));
+  clipboardPasteCount = 0;
+}
+function pasteClipboard(){
+  if(!clipboardShape) return;
+  pushHistory();
+  clipboardPasteCount++;
+  const offset = 16 * clipboardPasteCount;
+  const clone = JSON.parse(JSON.stringify(clipboardShape));
+  clone.id = uid();
+  if(clone.points){
+    clone.points = clone.points.map(p=>({x:p.x+offset, y:p.y+offset}));
+  } else {
+    clone.x += offset;
+    clone.y += offset;
+  }
+  shapes.push(clone);
+  selectedId = clone.id;
+  render();
+}
+
+/* ================= Canvas sizing ================= */
+function applyCanvasSize(){
+  artboard.setAttribute('width', canvas.w);
+  artboard.setAttribute('height', canvas.h);
+  artboard.setAttribute('viewBox', `0 0 ${canvas.w} ${canvas.h}`);
+  artboardShell.style.width = canvas.w+'px';
+  artboardShell.style.height = canvas.h+'px';
+}
+
+/* ================= Shape migration (backward compatibility) ================
+   Older saved files may contain the now-removed "button" shape type
+   (x/y/w/h + text + linkTo). We convert each into a plain rect (so it
+   keeps working as a link/button, since ANY shape can carry a linkTo
+   now) plus a separate text shape so the old label isn't lost. */
+function migrateShape(s){
+  if(s.type !== 'button') {
+    if(s.type==='rect' && s.cornerRadius===undefined) s.cornerRadius = 0;
+    if(s.rotation===undefined) s.rotation = 0;
+    return [s];
+  }
+  const {x,y,w,h} = s;
+  const rectShape = {
+    id: s.id,
+    type: 'rect',
+    color: s.color || {...DEFAULT_BUTTON_COLOR},
+    rotation: s.rotation || 0,
+    cornerRadius: Math.min(h/2, 14),
+    linkTo: s.linkTo || null,
+    points: [ {x,y}, {x:x+w,y}, {x:x+w,y:y+h}, {x,y:y+h} ]
+  };
+  const out = [rectShape];
+  if(s.text){
+    out.push({
+      id: uid(),
+      type: 'text',
+      text: s.text,
+      color: {r:255,g:255,b:255,a:1},
+      x: x+8, y: y+h/2-(h*0.42)/2, w: w-16, h: h*0.42,
+      rotation: 0
+    });
+  }
+  return out;
+}
+
+/* ================= Multi-page management ================= */
+function sanitizePageName(raw){
+  const cleaned = (raw||'').trim().replace(/\.html?$/i,'').replace(/[^a-zA-Z0-9_\-]/g,'');
+  return cleaned || 'page';
+}
+function uniquePageName(raw, excludeId){
+  let base = sanitizePageName(raw);
+  let name = base, n = 2;
+  while(pages.some(p=>p.name===name && p.id!==excludeId)){
+    name = base + n; n++;
+  }
+  return name;
+}
+function getCurrentPageRecord(){
+  return pages.find(p=>p.id===currentPageId);
+}
+/* Copies the live shapes/canvas/filename back into the `pages` array so
+   the current page's data isn't lost when we switch to / save another page. */
+function syncCurrentPageIntoPages(){
+  const rec = getCurrentPageRecord();
+  if(!rec) return;
+  rec.name = sanitizePageName(filename);
+  rec.canvas = JSON.parse(JSON.stringify(canvas));
+  rec.shapes = JSON.parse(JSON.stringify(shapes));
+}
+function updatePageNavLabel(){
+  pageNavLabel.textContent = filename;
+}
+function switchToPage(pageId){
+  if(pageId===currentPageId) return;
+  syncCurrentPageIntoPages();
+  const rec = pages.find(p=>p.id===pageId);
+  if(!rec) return;
+  currentPageId = pageId;
+  shapes = JSON.parse(JSON.stringify(rec.shapes));
+  canvas = JSON.parse(JSON.stringify(rec.canvas));
+  filename = rec.name;
+  filenameInput.value = filename;
+  selectedId = null;
+  undoStack = [];
+  redoStack = [];
+  applyCanvasSize();
+  render();
+  renderPagesList();
+  updatePageNavLabel();
+}
+function switchToPageOffset(offset){
+  syncCurrentPageIntoPages();
+  const idx = pages.findIndex(p=>p.id===currentPageId);
+  if(idx<0) return;
+  const nextIdx = (idx + offset + pages.length) % pages.length;
+  switchToPage(pages[nextIdx].id);
+}
+function addNewPage(){
+  syncCurrentPageIntoPages();
+  pageIdCounter++;
+  const name = uniquePageName('page'+pageIdCounter, null);
+  const rec = { id: pageIdCounter, name, canvas:{w:900,h:600,foldY:null}, shapes:[] };
+  pages.push(rec);
+  currentPageId = rec.id;
+  shapes = [];
+  canvas = {w:900,h:600,foldY:null};
+  filename = name;
+  filenameInput.value = filename;
+  selectedId = null;
+  undoStack = [];
+  redoStack = [];
+  applyCanvasSize();
+  render();
+  renderPagesList();
+  updatePageNavLabel();
+}
+function deleteCurrentPage(){
+  if(pages.length<=1){ alert('最後の1ページは削除できません。'); return; }
+  if(!confirm('このページを削除しますか？（元に戻せません）')) return;
+  const idx = pages.findIndex(p=>p.id===currentPageId);
+  pages.splice(idx,1);
+  const nextRec = pages[Math.max(0, idx-1)];
+  currentPageId = nextRec.id;
+  shapes = JSON.parse(JSON.stringify(nextRec.shapes));
+  canvas = JSON.parse(JSON.stringify(nextRec.canvas));
+  filename = nextRec.name;
+  filenameInput.value = filename;
+  selectedId = null;
+  undoStack = [];
+  redoStack = [];
+  applyCanvasSize();
+  render();
+  renderPagesList();
+  updatePageNavLabel();
+}
+function renderPagesList(){
+  pagesList.innerHTML = '';
+  pages.forEach(p=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = (p.id===currentPageId ? '● ' : '　') + p.name + '.html';
+    btn.style.fontWeight = p.id===currentPageId ? '800' : '600';
+    btn.addEventListener('click', ()=>{ switchToPage(p.id); document.getElementById('pagesMenu').style.display='none'; });
+    pagesList.appendChild(btn);
+  });
+}
+/* Populates the "link to page" dropdown shown for any shape with every
+   known page name (syncing first so a rename of the current page shows
+   up immediately), plus a "no link" option. */
+function refreshLinkTargetOptions(selectedValue){
+  syncCurrentPageIntoPages();
+  linkTargetSelect.innerHTML = '';
+  const noneOpt = document.createElement('option');
+  noneOpt.value = '';
+  noneOpt.textContent = 'リンクなし';
+  linkTargetSelect.appendChild(noneOpt);
+  pages.forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p.name;
+    opt.textContent = p.name + '.html';
+    linkTargetSelect.appendChild(opt);
+  });
+  linkTargetSelect.value = selectedValue || '';
+}
+
+/* ================= Rendering ================= */
+function render(){
+  artboard.innerHTML = '';
+
+  const bg = document.createElementNS(SVG_NS,'rect');
+  bg.setAttribute('x',0); bg.setAttribute('y',0);
+  bg.setAttribute('width',canvas.w); bg.setAttribute('height',canvas.h);
+  bg.setAttribute('fill', '#ffffff');
+  bg.dataset.bg = "1";
+  artboard.appendChild(bg);
+
+  /* Shade the area below the original device height, so it's clear at a
+     glance which part is "below the fold" once the page has been
+     stretched taller than the selected device size. */
+  if(canvas.foldY && canvas.h > canvas.foldY + 0.5){
+    const shade = document.createElementNS(SVG_NS,'rect');
+    shade.setAttribute('x',0); shade.setAttribute('y', canvas.foldY);
+    shade.setAttribute('width', canvas.w); shade.setAttribute('height', canvas.h - canvas.foldY);
+    shade.setAttribute('fill', 'rgba(53,89,224,0.045)');
+    shade.classList.add('fold-guide');
+    shade.style.pointerEvents = 'none';
+    artboard.appendChild(shade);
+  }
+
+  shapes.forEach(shape=>{
+    let el;
+    const c = shape.color;
+    if(shape.type==='rect'){
+      el = document.createElementNS(SVG_NS,'path');
+      el.setAttribute('d', buildRectPathD(shape));
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='triangle'){
+      el = document.createElementNS(SVG_NS,'polygon');
+      el.setAttribute('points', shape.points.map(p=>`${p.x},${p.y}`).join(' '));
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='circle'){
+      el = document.createElementNS(SVG_NS,'ellipse');
+      el.setAttribute('cx', shape.x+shape.w/2); el.setAttribute('cy', shape.y+shape.h/2);
+      el.setAttribute('rx', shape.w/2); el.setAttribute('ry', shape.h/2);
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='text'){
+      el = document.createElementNS(SVG_NS,'text');
+      el.setAttribute('x', shape.x); el.setAttribute('y', shape.y);
+      el.setAttribute('font-size', Math.max(10, shape.h*0.6));
+      el.setAttribute('font-weight', '700');
+      el.setAttribute('dominant-baseline','hanging');
+      el.setAttribute('fill', rgba(c));
+      el.textContent = shape.text;
+    } else if(shape.type==='path'){
+      el = document.createElementNS(SVG_NS,'path');
+      let d = '';
+      shape.points.forEach((p,i)=>{ d += (i===0?'M':'L') + p.x + ' ' + p.y + ' '; });
+      el.setAttribute('d', d);
+      el.setAttribute('fill','none');
+      el.setAttribute('stroke', rgba(c));
+      el.setAttribute('stroke-width', 4);
+      el.setAttribute('stroke-linecap','round');
+      el.setAttribute('stroke-linejoin','round');
+    } else if(shape.type==='image'){
+      el = document.createElementNS(SVG_NS,'image');
+      el.setAttribute('x', shape.x); el.setAttribute('y', shape.y);
+      el.setAttribute('width', shape.w); el.setAttribute('height', shape.h);
+      el.setAttribute('preserveAspectRatio','none');
+      el.setAttributeNS('http://www.w3.org/1999/xlink','href', shape.src);
+      el.setAttribute('href', shape.src);
+    }
+    el.classList.add('shape-el');
+    el.dataset.id = shape.id;
+    if(shape.linkTo){ el.style.cursor = 'pointer'; }
+    applyShapeTransform(el, shape);
+    el.addEventListener('pointerdown', (e)=>onShapePointerDown(e, shape));
+    if(shape.type==='text'){
+      el.addEventListener('dblclick', (e)=>{
+        e.stopPropagation();
+        const val = prompt('テキストを編集', shape.text);
+        if(val !== null){ pushHistory(); shape.text = val || ' '; render(); }
+      });
+    }
+    artboard.appendChild(el);
+  });
+
+  /* Dashed marker + label for the bottom edge of the original device
+     size, drawn on top of the shapes so it stays legible. */
+  if(canvas.foldY && canvas.h > canvas.foldY + 0.5){
+    const foldLine = document.createElementNS(SVG_NS,'line');
+    foldLine.setAttribute('x1',0); foldLine.setAttribute('y1', canvas.foldY);
+    foldLine.setAttribute('x2',canvas.w); foldLine.setAttribute('y2', canvas.foldY);
+    foldLine.setAttribute('stroke', '#3559E0');
+    foldLine.setAttribute('stroke-width', 1.5);
+    foldLine.setAttribute('stroke-dasharray', '6 5');
+    foldLine.setAttribute('opacity', '0.55');
+    foldLine.classList.add('fold-guide');
+    foldLine.style.pointerEvents = 'none';
+    artboard.appendChild(foldLine);
+
+    const label = document.createElementNS(SVG_NS,'text');
+    label.setAttribute('x', 8);
+    label.setAttribute('y', canvas.foldY - 8);
+    label.setAttribute('font-size', 11);
+    label.setAttribute('font-weight', '700');
+    label.setAttribute('fill', '#3559E0');
+    label.setAttribute('opacity', '0.75');
+    label.classList.add('fold-guide');
+    label.style.pointerEvents = 'none';
+    label.textContent = `機種の画面の高さ（${Math.round(canvas.foldY)}px）ここより下はスクロールで表示`;
+    artboard.appendChild(label);
+  }
+
+  if(selectedId!==null){
+    const s = getSelected();
+    if(s){
+      const box = getBBox(s);
+      const cx = box.x+box.w/2, cy = box.y+box.h/2;
+      const rot = s.rotation || 0;
+
+      // All selection visuals (bounding box, handles, rotate handle) live
+      // inside one <g>. Rotating that <g> about the shape's own center
+      // makes every handle orbit together with the shape, so the handle
+      // math itself can stay in the shape's simple, unrotated local space.
+      const group = document.createElementNS(SVG_NS,'g');
+      group.classList.add('selection-overlay');
+      if(rot){ group.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`); }
+
+      const rectEl = document.createElementNS(SVG_NS,'rect');
+      rectEl.setAttribute('x', box.x); rectEl.setAttribute('y', box.y);
+      rectEl.setAttribute('width', box.w); rectEl.setAttribute('height', box.h);
+      rectEl.classList.add('sel-box');
+      group.appendChild(rectEl);
+
+      const useVertexHandles = (s.type==='rect' || s.type==='triangle') && transformMode;
+      if(useVertexHandles){
+        // 変形ツールON: drag each corner point independently (free distort)
+        s.points.forEach((pt,i)=>{
+          const h = document.createElementNS(SVG_NS,'rect');
+          const sz=10;
+          h.setAttribute('x', pt.x-sz/2); h.setAttribute('y', pt.y-sz/2);
+          h.setAttribute('width', sz); h.setAttribute('height', sz);
+          h.classList.add('handle');
+          h.dataset.vertex = i;
+          h.style.cursor='move';
+          h.addEventListener('pointerdown',(e)=>onVertexPointerDown(e, s, i));
+          group.appendChild(h);
+        });
+      } else {
+        // 通常時: uniform bounding-box scale handles (works for every shape type)
+        const dirs = [
+          ['nw', box.x, box.y], ['n', box.x+box.w/2, box.y], ['ne', box.x+box.w, box.y],
+          ['w', box.x, box.y+box.h/2], ['e', box.x+box.w, box.y+box.h/2],
+          ['sw', box.x, box.y+box.h], ['s', box.x+box.w/2, box.y+box.h], ['se', box.x+box.w, box.y+box.h]
+        ];
+        dirs.forEach(([dir,hx,hy])=>{
+          const h = document.createElementNS(SVG_NS,'rect');
+          const sz=9;
+          h.setAttribute('x', hx-sz/2); h.setAttribute('y', hy-sz/2);
+          h.setAttribute('width', sz); h.setAttribute('height', sz);
+          h.classList.add('handle');
+          h.dataset.dir = dir;
+          h.style.cursor = dir.length===1 ? (dir==='n'||dir==='s'?'ns-resize':'ew-resize') :
+                           (dir==='nw'||dir==='se'?'nwse-resize':'nesw-resize');
+          h.addEventListener('pointerdown',(e)=>onHandlePointerDown(e, s, dir));
+          group.appendChild(h);
+        });
+      }
+
+      // Rotate handle: a small circle above the shape, joined by a dashed
+      // line, supported for every shape type (rect/triangle/circle/text/path).
+      const ROT_OFFSET = 28;
+      const rotLine = document.createElementNS(SVG_NS,'line');
+      rotLine.setAttribute('x1', cx); rotLine.setAttribute('y1', box.y);
+      rotLine.setAttribute('x2', cx); rotLine.setAttribute('y2', box.y-ROT_OFFSET);
+      rotLine.classList.add('rotate-line');
+      group.appendChild(rotLine);
+
+      const rotHandle = document.createElementNS(SVG_NS,'circle');
+      rotHandle.setAttribute('cx', cx); rotHandle.setAttribute('cy', box.y-ROT_OFFSET);
+      rotHandle.setAttribute('r', 7);
+      rotHandle.classList.add('handle','rotate-handle');
+      rotHandle.addEventListener('pointerdown',(e)=>onRotatePointerDown(e, s));
+      group.appendChild(rotHandle);
+
+      artboard.appendChild(group);
+    }
+  }
+
+  updateRightPanel();
+  updateToolUI();
+}
+
+function updateToolUI(){
+  document.querySelectorAll('.tool-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.tool===currentTool);
+  });
+  const hints = {
+    select: '図形をクリックして選択・ドラッグで移動できます',
+    rect:   'ドラッグで四角形を描きます（Shiftで正方形。右パネルの「配置とリンク」でボタン化できます）',
+    triangle:'ドラッグで三角形を描きます（Shiftで正三角形）',
+    circle: 'ドラッグで円を描きます（Shiftで正円）',
+    text:   'キャンバスをクリックしてテキストを配置します',
+    pen:    'キャンバス上をドラッグして自由に描けます',
+    image:  'キャンバスをクリックして画像ファイルを選択・配置します',
+    eraser: '図形をクリックすると削除します'
+  };
+  toolHint.textContent = hints[currentTool] || '';
+}
+
+function setRightTab(tab){
+  activeRightTab = tab;
+  document.getElementById('tabStyleBtn').classList.toggle('active', tab==='style');
+  document.getElementById('tabLayoutBtn').classList.toggle('active', tab==='layout');
+  document.getElementById('tabStyleContent').classList.toggle('hidden', tab!=='style');
+  document.getElementById('tabLayoutContent').classList.toggle('hidden', tab!=='layout');
+}
+
+function updateRightPanel(){
+  const s = getSelected();
+  if(!s){ rightPanel.classList.remove('open'); return; }
+  rightPanel.classList.add('open');
+  document.getElementById('transformToggle').classList.toggle('on', transformMode);
+  transformHint.textContent = ((s.type==='rect'||s.type==='triangle') && transformMode)
+    ? '頂点をドラッグして自由に変形できます（変形すると角の丸みは無効になります）'
+    : '四隅・辺のハンドルで拡大縮小できます';
+
+  if(s.type === 'text'){
+    textEditWrap.style.display = 'flex';
+    if(document.activeElement !== fontSizeSlider){
+      fontSizeSlider.value = Math.round(s.h*0.6);
+      fontSizeValue.textContent = fontSizeSlider.value;
+    }
+    if(document.activeElement !== textEditArea){
+      textEditArea.value = s.text;
+    }
+  } else {
+    textEditWrap.style.display = 'none';
+  }
+
+  if(s.type === 'rect'){
+    radiusEditWrap.style.display = 'flex';
+    if(document.activeElement !== radiusSlider){
+      radiusSlider.value = s.cornerRadius || 0;
+      radiusValue.textContent = radiusSlider.value;
+    }
+  } else {
+    radiusEditWrap.style.display = 'none';
+  }
+
+  imageEditWrap.style.display = (s.type === 'image') ? 'flex' : 'none';
+  colorControls.style.display = (s.type === 'image') ? 'none' : 'flex';
+
+  if(s.type !== 'image'){
+    document.getElementById('rSlider').value = s.color.r;
+    document.getElementById('gSlider').value = s.color.g;
+    document.getElementById('bSlider').value = s.color.b;
+    document.getElementById('aSlider').value = Math.round(s.color.a*100);
+    document.getElementById('rValue').textContent = s.color.r;
+    document.getElementById('gValue').textContent = s.color.g;
+    document.getElementById('bValue').textContent = s.color.b;
+    document.getElementById('aValue').textContent = Math.round(s.color.a*100);
+    document.getElementById('colorSwatch').style.background = rgba(s.color);
+  }
+
+  // ---- 配置とリンク タブ ----
+  const hasLink = !!s.linkTo;
+  if(document.activeElement !== linkEnableCheckbox){
+    linkEnableCheckbox.checked = hasLink;
+  }
+  linkEditWrap.style.display = hasLink ? 'flex' : 'none';
+  if(hasLink && document.activeElement !== linkTargetSelect){
+    refreshLinkTargetOptions(s.linkTo || '');
+  }
+}
+
+let textEditHistorySaved = false;
+textEditArea.addEventListener('focus', ()=>{ textEditHistorySaved = false; });
+textEditArea.addEventListener('input', ()=>{
+  const s = getSelected();
+  if(!s || s.type!=='text') return;
+  if(!textEditHistorySaved){ pushHistory(); textEditHistorySaved = true; }
+  s.text = textEditArea.value || ' ';
+  updateShapeDom(s);
+});
+
+let fontSizeHistorySaved = false;
+fontSizeSlider.addEventListener('pointerdown', ()=>{ fontSizeHistorySaved = false; });
+fontSizeSlider.addEventListener('input', ()=>{
+  const s = getSelected();
+  if(!s || s.type!=='text') return;
+  if(!fontSizeHistorySaved){ pushHistory(); fontSizeHistorySaved = true; }
+  const fontSize = parseInt(fontSizeSlider.value, 10);
+  fontSizeValue.textContent = fontSize;
+  s.h = fontSize/0.6;
+  updateShapeDom(s);
+  updateSelectionOverlay(s);
+});
+
+let radiusHistorySaved = false;
+radiusSlider.addEventListener('pointerdown', ()=>{ radiusHistorySaved = false; });
+radiusSlider.addEventListener('input', ()=>{
+  const s = getSelected();
+  if(!s || s.type!=='rect') return;
+  if(!radiusHistorySaved){ pushHistory(); radiusHistorySaved = true; }
+  s.cornerRadius = clamp(parseInt(radiusSlider.value,10), 0, MAX_CORNER_RADIUS);
+  radiusValue.textContent = s.cornerRadius;
+  updateShapeDom(s);
+});
+
+linkEnableCheckbox.addEventListener('change', ()=>{
+  const s = getSelected();
+  if(!s) return;
+  pushHistory();
+  if(linkEnableCheckbox.checked){
+    s.linkTo = (pages.find(p=>p.id!==currentPageId) || {}).name || '';
+  } else {
+    s.linkTo = null;
+  }
+  render();
+});
+
+let linkTargetHistorySaved = false;
+linkTargetSelect.addEventListener('focus', ()=>{ linkTargetHistorySaved = false; });
+linkTargetSelect.addEventListener('change', ()=>{
+  const s = getSelected();
+  if(!s) return;
+  if(!linkTargetHistorySaved){ pushHistory(); linkTargetHistorySaved = true; }
+  s.linkTo = linkTargetSelect.value || null;
+  render();
+});
+
+/* ================= Coordinates ================= */
+function svgPoint(evt){
+  const rect = artboard.getBoundingClientRect();
+  const scaleX = canvas.w / rect.width;
+  const scaleY = canvas.h / rect.height;
+  return { x:(evt.clientX-rect.left)*scaleX, y:(evt.clientY-rect.top)*scaleY };
+}
+
+/* ================= Shape creation (Scratch-style drag draw) ================= */
+let shapeDrawState = null;
+let previewEl = null;
+
+function startShapeDraw(e, type){
+  const start = svgPoint(e);
+  shapeDrawState = { type, startX:start.x, startY:start.y, current:{x:start.x,y:start.y,w:0,h:0} };
+  previewEl = document.createElementNS(SVG_NS, type==='circle' ? 'ellipse' : 'polygon');
+  previewEl.classList.add('shape-preview');
+  artboard.appendChild(previewEl);
+  updatePreview();
+  window.addEventListener('pointermove', onShapeDrawMove);
+  window.addEventListener('pointerup', onShapeDrawUp);
+}
+
+function updatePreview(){
+  const {type,current} = shapeDrawState;
+  const {x,y,w,h} = current;
+  if(type==='rect'){
+    previewEl.setAttribute('points', `${x},${y} ${x+w},${y} ${x+w},${y+h} ${x},${y+h}`);
+  } else if(type==='triangle'){
+    previewEl.setAttribute('points', `${x+w/2},${y} ${x},${y+h} ${x+w},${y+h}`);
+  } else if(type==='circle'){
+    previewEl.setAttribute('cx', x+w/2); previewEl.setAttribute('cy', y+h/2);
+    previewEl.setAttribute('rx', w/2); previewEl.setAttribute('ry', h/2);
+  }
+}
+
+function onShapeDrawMove(e){
+  if(!shapeDrawState) return;
+  const p = svgPoint(e);
+  const rawDx = p.x - shapeDrawState.startX;
+  const rawDy = p.y - shapeDrawState.startY;
+  let w = Math.abs(rawDx);
+  let h = Math.abs(rawDy);
+
+  if(e.shiftKey){
+    if(shapeDrawState.type === 'triangle'){
+      // constrain to an equilateral triangle: height = base * sqrt(3)/2
+      const ratio = Math.sqrt(3)/2;
+      const side = Math.max(w, h/ratio);
+      w = side;
+      h = side*ratio;
+    } else {
+      // square / perfect circle
+      const side = Math.max(w,h);
+      w = side;
+      h = side;
+    }
+  }
+
+  const x = rawDx >= 0 ? shapeDrawState.startX : shapeDrawState.startX - w;
+  const y = rawDy >= 0 ? shapeDrawState.startY : shapeDrawState.startY - h;
+
+  shapeDrawState.current = {x,y,w,h};
+  updatePreview();
+}
+
+function onShapeDrawUp(){
+  window.removeEventListener('pointermove', onShapeDrawMove);
+  window.removeEventListener('pointerup', onShapeDrawUp);
+  if(previewEl){ previewEl.remove(); previewEl=null; }
+  if(!shapeDrawState) return;
+  let {x,y,w,h} = shapeDrawState.current;
+  const type = shapeDrawState.type;
+  if(w<6 && h<6){ w=120; h = (type==='circle')?120:90; }
+  w = Math.max(w,10); h = Math.max(h,10);
+
+  const shape = { id: uid(), type, color: {...DEFAULT_SHAPE_COLOR}, rotation:0, linkTo:null };
+  if(type==='rect'){
+    shape.points = [ {x,y}, {x:x+w,y}, {x:x+w,y:y+h}, {x,y:y+h} ];
+    shape.cornerRadius = 0;
+  } else if(type==='triangle'){
+    shape.points = [ {x:x+w/2,y}, {x,y:y+h}, {x:x+w,y:y+h} ];
+  } else if(type==='circle'){
+    shape.x=x; shape.y=y; shape.w=w; shape.h=h;
+  }
+  pushHistory();
+  shapes.push(shape);
+  selectedId = shape.id;
+  shapeDrawState = null;
+  render();
+}
+
+function createTextAt(cx,cy){
+  const val = prompt('テキストを入力', 'テキスト');
+  if(val===null) return;
+  const shape = { id: uid(), type:'text', text: val || ' ', color:{...DEFAULT_TEXT_COLOR},
+    x:cx-70, y:cy-20, w:140, h:40, rotation:0, linkTo:null };
+  pushHistory();
+  shapes.push(shape);
+  selectedId = shape.id;
+  render();
+}
+
+/* Opens the native file picker at the given canvas position; the actual
+   shape is created once the user picks a file (see imageUploadInput's
+   'change' handler below), since reading the file is asynchronous. */
+function startImagePlacement(cx,cy){
+  pendingImagePos = {x:cx, y:cy};
+  imageUploadInput.value = '';
+  imageUploadInput.click();
+}
+
+function loadImageAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = ()=>reject(new Error('画像の読み込みに失敗しました'));
+    reader.readAsDataURL(file);
+  });
+}
+
+imageUploadInput.addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  const pos = pendingImagePos;
+  pendingImagePos = null;
+  if(!file || !pos) return;
+  try{
+    const dataUrl = await loadImageAsDataURL(file);
+    const dims = await new Promise((resolve,reject)=>{
+      const img = new Image();
+      img.onload = ()=>resolve({w:img.naturalWidth||200, h:img.naturalHeight||200});
+      img.onerror = ()=>reject(new Error('画像の読み込みに失敗しました'));
+      img.src = dataUrl;
+    });
+    const maxDim = 280;
+    const scale = Math.min(1, maxDim / Math.max(dims.w, dims.h));
+    const w = Math.max(20, Math.round(dims.w*scale));
+    const h = Math.max(20, Math.round(dims.h*scale));
+    const shape = { id: uid(), type:'image', src: dataUrl, x:pos.x-w/2, y:pos.y-h/2, w, h, rotation:0, linkTo:null };
+    pushHistory();
+    shapes.push(shape);
+    selectedId = shape.id;
+    currentTool = 'select';
+    updateToolUI();
+    render();
+  }catch(err){
+    alert(err.message || '画像の配置に失敗しました');
+  }
+});
+
+document.getElementById('replaceImageBtn').addEventListener('click', ()=>{
+  const s = getSelected();
+  if(!s || s.type!=='image') return;
+  pendingImagePos = null; // replacing keeps the existing position/size
+  const handler = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const dataUrl = await loadImageAsDataURL(file);
+      pushHistory();
+      s.src = dataUrl;
+      updateShapeDom(s);
+    }catch(err){
+      alert(err.message || '画像の差し替えに失敗しました');
+    }
+    imageUploadInput.removeEventListener('change', handler);
+  };
+  imageUploadInput.value = '';
+  imageUploadInput.addEventListener('change', handler);
+  imageUploadInput.click();
+});
+
+/* ================= Snap guides (Canva-style alignment & spacing) ================= */
+const SNAP_THRESHOLD = 6;    // svg units; how close an edge/center must be to "grab" an alignment line
+const SPACING_THRESHOLD = 6; // svg units; how close a gap must be to match another gap
+
+/* Collect candidate x-lines to snap to: canvas edges/center/quarters,
+   plus every other (non-rotated) shape's left / center / right edges. */
+function getSnapLinesX(excludeId){
+  const lines = [0, canvas.w/4, canvas.w/2, canvas.w*3/4, canvas.w];
+  shapes.forEach(s=>{
+    if(s.id===excludeId || s.rotation) return;
+    const b = getBBox(s);
+    lines.push(b.x, b.x+b.w/2, b.x+b.w);
+  });
+  return lines;
+}
+function getSnapLinesY(excludeId){
+  const lines = [0, canvas.h/4, canvas.h/2, canvas.h*3/4, canvas.h];
+  shapes.forEach(s=>{
+    if(s.id===excludeId || s.rotation) return;
+    const b = getBBox(s);
+    lines.push(b.y, b.y+b.h/2, b.y+b.h);
+  });
+  return lines;
+}
+
+function overlapCenter(aMin,aMax,bMin,bMax){
+  const lo = Math.max(aMin,bMin), hi = Math.min(aMax,bMax);
+  return hi>lo ? (lo+hi)/2 : (aMin+aMax)/2;
+}
+
+/* Generic 1D "distribution" snap for one axis. `boxes` are the other
+   shapes projected onto this axis as {min,max,orig} — already filtered
+   to only those that overlap the dragged shape on the *other* axis
+   (its "row" for x-axis spacing, its "column" for y-axis spacing).
+   Finds the nearest stationary neighbor immediately before and after
+   the dragged shape and proposes a tiny correction so that either:
+     (a) the shape becomes exactly centered between them, or
+     (b) the gap on one side matches the next gap already established
+         further along that row/column (repeating rhythm) —
+   mirroring Canva/Figma's equal-spacing guides. */
+function computeSpacingAxis(candMin, candMax, boxes){
+  if(boxes.length===0) return null;
+  const sorted = boxes.slice().sort((a,b)=>a.min-b.min);
+
+  let prev=null, next=null;
+  sorted.forEach(b=>{
+    if(b.max <= candMin+0.5){ if(!prev || b.max>prev.max) prev=b; }
+    if(b.min >= candMax-0.5){ if(!next || b.min<next.min) next=b; }
+  });
+
+  let best=null;
+  function consider(delta,dist,meta){
+    if(dist<=SPACING_THRESHOLD && (best===null || dist<best.dist)) best={delta,dist,meta};
+  }
+
+  // (a) equal gap on both sides — center the shape between its neighbors
+  if(prev && next){
+    const gapPrev = candMin-prev.max, gapNext = next.min-candMax;
+    if(gapPrev>-1 && gapNext>-1){
+      const diff = gapNext-gapPrev;
+      consider(diff/2, Math.abs(diff)/2, {kind:'center', prev, next});
+    }
+  }
+  // (b) match the gap already established just before `prev`
+  if(prev){
+    const prevPrev = sorted.filter(b=>b.max<=prev.min+0.5).reduce((m,b)=>(!m||b.max>m.max)?b:m,null);
+    if(prevPrev){
+      const established = prev.min-prevPrev.max;
+      const current = candMin-prev.max;
+      consider(established-current, Math.abs(established-current), {kind:'chainPrev', prevPrev, prev});
+    }
+  }
+  // (b) match the gap already established just after `next`
+  if(next){
+    const nextNext = sorted.filter(b=>b.min>=next.max-0.5).reduce((m,b)=>(!m||b.min<m.min)?b:m,null);
+    if(nextNext){
+      const established = nextNext.min-next.max;
+      const current = next.min-candMax;
+      consider(current-established, Math.abs(current-established), {kind:'chainNext', next, nextNext});
+    }
+  }
+  return best;
+}
+
+/* Turns a spacing match (from computeSpacingAxis) into drawable gap
+   guides once the final, snapped position is known. Each case draws
+   two segments so the equal distances are visually obvious. */
+function buildSpacingGuidesX(meta, finalLeft, finalRight, candY, h){
+  const guides = [];
+  if(meta.kind==='center'){
+    const {prev,next} = meta;
+    guides.push({type:'gapH', x1:prev.max, x2:finalLeft, y:overlapCenter(candY,candY+h,prev.orig.y,prev.orig.y+prev.orig.h)});
+    guides.push({type:'gapH', x1:finalRight, x2:next.min, y:overlapCenter(candY,candY+h,next.orig.y,next.orig.y+next.orig.h)});
+  } else if(meta.kind==='chainPrev'){
+    const {prevPrev,prev} = meta;
+    guides.push({type:'gapH', x1:prevPrev.max, x2:prev.min, y:overlapCenter(prev.orig.y,prev.orig.y+prev.orig.h,prevPrev.orig.y,prevPrev.orig.y+prevPrev.orig.h)});
+    guides.push({type:'gapH', x1:prev.max, x2:finalLeft, y:overlapCenter(candY,candY+h,prev.orig.y,prev.orig.y+prev.orig.h)});
+  } else if(meta.kind==='chainNext'){
+    const {next,nextNext} = meta;
+    guides.push({type:'gapH', x1:next.max, x2:nextNext.min, y:overlapCenter(next.orig.y,next.orig.y+next.orig.h,nextNext.orig.y,nextNext.orig.y+nextNext.orig.h)});
+    guides.push({type:'gapH', x1:finalRight, x2:next.min, y:overlapCenter(candY,candY+h,next.orig.y,next.orig.y+next.orig.h)});
+  }
+  return guides;
+}
+function buildSpacingGuidesY(meta, finalTop, finalBottom, candX, w){
+  const guides = [];
+  if(meta.kind==='center'){
+    const {prev,next} = meta;
+    guides.push({type:'gapV', y1:prev.max, y2:finalTop, x:overlapCenter(candX,candX+w,prev.orig.x,prev.orig.x+prev.orig.w)});
+    guides.push({type:'gapV', y1:finalBottom, y2:next.min, x:overlapCenter(candX,candX+w,next.orig.x,next.orig.x+next.orig.w)});
+  } else if(meta.kind==='chainPrev'){
+    const {prevPrev,prev} = meta;
+    guides.push({type:'gapV', y1:prevPrev.max, y2:prev.min, x:overlapCenter(prev.orig.x,prev.orig.x+prev.orig.w,prevPrev.orig.x,prevPrev.orig.x+prevPrev.orig.w)});
+    guides.push({type:'gapV', y1:prev.max, y2:finalTop, x:overlapCenter(candX,candX+w,prev.orig.x,prev.orig.x+prev.orig.w)});
+  } else if(meta.kind==='chainNext'){
+    const {next,nextNext} = meta;
+    guides.push({type:'gapV', y1:next.max, y2:nextNext.min, x:overlapCenter(next.orig.x,next.orig.x+next.orig.w,nextNext.orig.x,nextNext.orig.x+nextNext.orig.w)});
+    guides.push({type:'gapV', y1:finalBottom, y2:next.min, x:overlapCenter(candX,candX+w,next.orig.x,next.orig.x+next.orig.w)});
+  }
+  return guides;
+}
+
+/* Given a shape's candidate (unrotated) bounding box while it's being
+   dragged, find the closest matching guide on each axis — either an
+   alignment line (edge/center against the canvas or another shape) or
+   an equal-spacing match against neighboring shapes — and return the
+   tiny position correction (dx/dy) plus which guide(s) to draw.
+   Rotated shapes are skipped (both as sources and as things being
+   snapped) to keep the math simple and honest. */
+function computeMoveSnap(candX, candY, w, h, excludeId, rotation){
+  if(rotation){ return {dx:0, dy:0, guides:[]}; }
+
+  const left = candX, right = candX+w, centerX = candX+w/2;
+  const top = candY, bottom = candY+h, centerY = candY+h/2;
+
+  const xLines = getSnapLinesX(excludeId);
+  const yLines = getSnapLinesY(excludeId);
+
+  let bestDx = 0, bestDxDist = SNAP_THRESHOLD, guideXList = [];
+  [left, centerX, right].forEach(val=>{
+    xLines.forEach(t=>{
+      const dist = Math.abs(val - t);
+      if(dist < bestDxDist){ bestDxDist = dist; bestDx = t - val; guideXList = [{type:'v', pos:t}]; }
+    });
+  });
+
+  let bestDy = 0, bestDyDist = SNAP_THRESHOLD, guideYList = [];
+  [top, centerY, bottom].forEach(val=>{
+    yLines.forEach(t=>{
+      const dist = Math.abs(val - t);
+      if(dist < bestDyDist){ bestDyDist = dist; bestDy = t - val; guideYList = [{type:'h', pos:t}]; }
+    });
+  });
+
+  // ---- Equal-spacing / distribution snapping ----
+  const otherBoxes = shapes.filter(s=>s.id!==excludeId && !s.rotation).map(s=>getBBox(s));
+
+  const rowBoxes = otherBoxes
+    .filter(b => Math.min(bottom, b.y+b.h) - Math.max(top, b.y) > 0) // shares a "row" with the dragged shape
+    .map(b=>({min:b.x, max:b.x+b.w, orig:b}));
+  const spacingX = computeSpacingAxis(left, right, rowBoxes);
+  if(spacingX && spacingX.dist < bestDxDist){
+    bestDxDist = spacingX.dist;
+    bestDx = spacingX.delta;
+    guideXList = buildSpacingGuidesX(spacingX.meta, left+spacingX.delta, right+spacingX.delta, top, h);
+  }
+
+  const colBoxes = otherBoxes
+    .filter(b => Math.min(right, b.x+b.w) - Math.max(left, b.x) > 0) // shares a "column" with the dragged shape
+    .map(b=>({min:b.y, max:b.y+b.h, orig:b}));
+  const spacingY = computeSpacingAxis(top, bottom, colBoxes);
+  if(spacingY && spacingY.dist < bestDyDist){
+    bestDyDist = spacingY.dist;
+    bestDy = spacingY.delta;
+    guideYList = buildSpacingGuidesY(spacingY.meta, top+spacingY.delta, bottom+spacingY.delta, left, w);
+  }
+
+  return {dx:bestDx, dy:bestDy, guides:[...guideXList, ...guideYList]};
+}
+
+function drawSnapGuides(guides){
+  let group = document.getElementById('snapGuideGroup');
+  if(!group){
+    group = document.createElementNS(SVG_NS,'g');
+    group.id = 'snapGuideGroup';
+    group.style.pointerEvents = 'none';
+    artboard.appendChild(group);
+  } else {
+    artboard.appendChild(group); // keep it on top of the shape being dragged
+  }
+  group.innerHTML = '';
+  const TICK = 5; // half-length of the small perpendicular end-caps on spacing guides
+  guides.forEach(g=>{
+    if(g.type==='v'){
+      const line = document.createElementNS(SVG_NS,'line');
+      line.setAttribute('x1', g.pos); line.setAttribute('y1', 0);
+      line.setAttribute('x2', g.pos); line.setAttribute('y2', canvas.h);
+      line.classList.add('snap-guide');
+      group.appendChild(line);
+    } else if(g.type==='h'){
+      const line = document.createElementNS(SVG_NS,'line');
+      line.setAttribute('x1', 0); line.setAttribute('y1', g.pos);
+      line.setAttribute('x2', canvas.w); line.setAttribute('y2', g.pos);
+      line.classList.add('snap-guide');
+      group.appendChild(line);
+    } else if(g.type==='gapH'){
+      const x1 = Math.min(g.x1,g.x2), x2 = Math.max(g.x1,g.x2);
+      const line = document.createElementNS(SVG_NS,'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', g.y);
+      line.setAttribute('x2', x2); line.setAttribute('y2', g.y);
+      line.classList.add('snap-guide');
+      group.appendChild(line);
+      [x1,x2].forEach(x=>{
+        const tick = document.createElementNS(SVG_NS,'line');
+        tick.setAttribute('x1', x); tick.setAttribute('y1', g.y-TICK);
+        tick.setAttribute('x2', x); tick.setAttribute('y2', g.y+TICK);
+        tick.classList.add('snap-guide');
+        group.appendChild(tick);
+      });
+    } else if(g.type==='gapV'){
+      const y1 = Math.min(g.y1,g.y2), y2 = Math.max(g.y1,g.y2);
+      const line = document.createElementNS(SVG_NS,'line');
+      line.setAttribute('x1', g.x); line.setAttribute('y1', y1);
+      line.setAttribute('x2', g.x); line.setAttribute('y2', y2);
+      line.classList.add('snap-guide');
+      group.appendChild(line);
+      [y1,y2].forEach(y=>{
+        const tick = document.createElementNS(SVG_NS,'line');
+        tick.setAttribute('x1', g.x-TICK); tick.setAttribute('y1', y);
+        tick.setAttribute('x2', g.x+TICK); tick.setAttribute('y2', y);
+        tick.classList.add('snap-guide');
+        group.appendChild(tick);
+      });
+    }
+  });
+}
+function clearSnapGuides(){
+  const group = document.getElementById('snapGuideGroup');
+  if(group) group.remove();
+}
+
+/* ================= Move / resize / vertex-drag ================= */
+let dragState = null;
+
+/* Lightweight, in-place DOM updates used *during* a drag so nothing gets
+   torn down/rebuilt mid-gesture (rebuilding elements mid-drag is what was
+   breaking vertex dragging). A full render() only happens once, on pointerup. */
+function updateShapeDom(shape){
+  const el = artboard.querySelector(`[data-id="${shape.id}"]`);
+  if(!el) return;
+  if(shape.type==='rect'){
+    el.setAttribute('d', buildRectPathD(shape));
+  } else if(shape.type==='triangle'){
+    el.setAttribute('points', shape.points.map(p=>`${p.x},${p.y}`).join(' '));
+  } else if(shape.type==='circle'){
+    el.setAttribute('cx', shape.x+shape.w/2);
+    el.setAttribute('cy', shape.y+shape.h/2);
+    el.setAttribute('rx', shape.w/2);
+    el.setAttribute('ry', shape.h/2);
+  } else if(shape.type==='text'){
+    el.setAttribute('x', shape.x);
+    el.setAttribute('y', shape.y);
+    el.setAttribute('font-size', Math.max(10, shape.h*0.6));
+    el.textContent = shape.text;
+  } else if(shape.type==='path'){
+    let d = '';
+    shape.points.forEach((p,i)=>{ d += (i===0?'M':'L') + p.x + ' ' + p.y + ' '; });
+    el.setAttribute('d', d);
+  } else if(shape.type==='image'){
+    el.setAttribute('x', shape.x); el.setAttribute('y', shape.y);
+    el.setAttribute('width', shape.w); el.setAttribute('height', shape.h);
+  }
+  applyShapeTransform(el, shape);
+}
+function updateSelectionOverlay(shape){
+  const group = artboard.querySelector('.selection-overlay');
+  if(!group) return;
+
+  const box = getBBox(shape);
+  const cx = box.x+box.w/2, cy = box.y+box.h/2;
+  const rot = shape.rotation || 0;
+  if(rot){ group.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`); }
+  else { group.removeAttribute('transform'); }
+
+  const selBox = group.querySelector('.sel-box');
+  if(selBox){
+    selBox.setAttribute('x', box.x); selBox.setAttribute('y', box.y);
+    selBox.setAttribute('width', box.w); selBox.setAttribute('height', box.h);
+  }
+  const useVertexHandles = (shape.type==='rect' || shape.type==='triangle') && transformMode;
+  if(useVertexHandles){
+    shape.points.forEach((pt,i)=>{
+      const h = group.querySelector(`.handle[data-vertex="${i}"]`);
+      if(h){
+        const sz=10;
+        h.setAttribute('x', pt.x-sz/2);
+        h.setAttribute('y', pt.y-sz/2);
+      }
+    });
+  } else {
+    const dirPositions = {
+      nw:[box.x, box.y], n:[box.x+box.w/2, box.y], ne:[box.x+box.w, box.y],
+      w:[box.x, box.y+box.h/2], e:[box.x+box.w, box.y+box.h/2],
+      sw:[box.x, box.y+box.h], s:[box.x+box.w/2, box.y+box.h], se:[box.x+box.w, box.y+box.h]
+    };
+    Object.keys(dirPositions).forEach(dir=>{
+      const h = group.querySelector(`.handle[data-dir="${dir}"]`);
+      if(h){
+        const [hx,hy] = dirPositions[dir];
+        const sz=9;
+        h.setAttribute('x', hx-sz/2);
+        h.setAttribute('y', hy-sz/2);
+      }
+    });
+  }
+
+  const ROT_OFFSET = 28;
+  const rotLine = group.querySelector('.rotate-line');
+  if(rotLine){
+    rotLine.setAttribute('x1', cx); rotLine.setAttribute('y1', box.y);
+    rotLine.setAttribute('x2', cx); rotLine.setAttribute('y2', box.y-ROT_OFFSET);
+  }
+  const rotHandle = group.querySelector('.rotate-handle');
+  if(rotHandle){
+    rotHandle.setAttribute('cx', cx);
+    rotHandle.setAttribute('cy', box.y-ROT_OFFSET);
+  }
+}
+
+function onShapePointerDown(e, shape){
+  e.stopPropagation();
+  if(currentTool==='eraser'){
+    pushHistory();
+    shapes = shapes.filter(s=>s.id!==shape.id);
+    if(selectedId===shape.id) selectedId=null;
+    render();
+    return;
+  }
+  if(currentTool==='pen'){
+    startPenStroke(e);
+    return;
+  }
+  selectedId = shape.id;
+  render();
+  const start = svgPoint(e);
+  dragState = { mode:'move', shape, startX:start.x, startY:start.y, orig: JSON.parse(JSON.stringify(shape)), origBox: getBBox(shape), historySaved:false };
+  window.addEventListener('pointermove', onWindowPointerMove);
+  window.addEventListener('pointerup', onWindowPointerUp);
+}
+
+function onVertexPointerDown(e, shape, index){
+  e.stopPropagation();
+  e.preventDefault();
+  const box = getBBox(shape);
+  const cx = box.x+box.w/2, cy = box.y+box.h/2;
+  const rot = shape.rotation || 0;
+  const startRaw = svgPoint(e);
+  const start = rot ? rotatePoint(startRaw.x, startRaw.y, cx, cy, -rot) : startRaw;
+  dragState = { mode:'vertex', shape, index, startX:start.x, startY:start.y, orig: {...shape.points[index]}, rotCenter:{cx,cy}, rot, historySaved:false };
+  window.addEventListener('pointermove', onWindowPointerMove);
+  window.addEventListener('pointerup', onWindowPointerUp);
+}
+
+function onHandlePointerDown(e, shape, dir){
+  e.stopPropagation();
+  e.preventDefault();
+  const box = getBBox(shape);
+  const cx = box.x+box.w/2, cy = box.y+box.h/2;
+  const rot = shape.rotation || 0;
+  const startRaw = svgPoint(e);
+  const start = rot ? rotatePoint(startRaw.x, startRaw.y, cx, cy, -rot) : startRaw;
+  const orig = { ...JSON.parse(JSON.stringify(shape)), ...box };
+  dragState = { mode:'resize', shape, dir, startX:start.x, startY:start.y, orig, rotCenter:{cx,cy}, rot, historySaved:false };
+  window.addEventListener('pointermove', onWindowPointerMove);
+  window.addEventListener('pointerup', onWindowPointerUp);
+}
+
+function onRotatePointerDown(e, shape){
+  e.stopPropagation();
+  e.preventDefault();
+  const box = getBBox(shape);
+  const cx = box.x+box.w/2, cy = box.y+box.h/2;
+  const start = svgPoint(e);
+  const startAngle = Math.atan2(start.y-cy, start.x-cx) * 180/Math.PI;
+  dragState = { mode:'rotate', shape, cx, cy, startAngle, startRotation: shape.rotation||0, historySaved:false };
+  window.addEventListener('pointermove', onWindowPointerMove);
+  window.addEventListener('pointerup', onWindowPointerUp);
+}
+
+function onWindowPointerMove(e){
+  if(!dragState) return;
+  if(!dragState.historySaved){ pushHistory(); dragState.historySaved = true; }
+
+  const p = svgPoint(e);
+  const shape = dragState.shape;
+
+  if(dragState.mode==='move'){
+    let dx = p.x - dragState.startX;
+    let dy = p.y - dragState.startY;
+    const orig = dragState.orig;
+    const origBox = dragState.origBox;
+
+    // Snap the candidate position to nearby center-lines / edges (of the
+    // canvas or of other shapes), Canva-style, unless the shift key is
+    // held (holding shift temporarily disables snapping for fine control).
+    if(!e.shiftKey){
+      const candX = origBox.x + dx;
+      const candY = origBox.y + dy;
+      const snap = computeMoveSnap(candX, candY, origBox.w, origBox.h, shape.id, shape.rotation);
+      dx += snap.dx;
+      dy += snap.dy;
+      if(snap.guides.length){ drawSnapGuides(snap.guides); }
+      else { clearSnapGuides(); }
+    } else {
+      clearSnapGuides();
+    }
+
+    if(shape.points){
+      shape.points = orig.points.map(pt=>({x:pt.x+dx, y:pt.y+dy}));
+    } else {
+      shape.x = orig.x + dx;
+      shape.y = orig.y + dy;
+    }
+  } else if(dragState.mode==='vertex'){
+    // Convert the pointer into the shape's own unrotated coordinate
+    // space (fixed around the center captured at drag start) so vertex
+    // dragging feels natural even on a rotated shape.
+    const pLocal = dragState.rot ? rotatePoint(p.x,p.y,dragState.rotCenter.cx,dragState.rotCenter.cy,-dragState.rot) : p;
+    const dx = pLocal.x - dragState.startX;
+    const dy = pLocal.y - dragState.startY;
+    const orig = dragState.orig;
+    shape.points[dragState.index] = { x: orig.x+dx, y: orig.y+dy };
+  } else if(dragState.mode==='resize'){
+    const pLocal = dragState.rot ? rotatePoint(p.x,p.y,dragState.rotCenter.cx,dragState.rotCenter.cy,-dragState.rot) : p;
+    const dx = pLocal.x - dragState.startX;
+    const dy = pLocal.y - dragState.startY;
+    const orig = dragState.orig;
+    let {x,y,w,h} = orig;
+    const dir = dragState.dir;
+    if(dir.includes('n')){ y = orig.y+dy; h = orig.h-dy; }
+    if(dir.includes('s')){ h = orig.h+dy; }
+    if(dir.includes('w')){ x = orig.x+dx; w = orig.w-dx; }
+    if(dir.includes('e')){ w = orig.w+dx; }
+    w = Math.max(w,10); h = Math.max(h,10);
+    if(dir.includes('n')) y = orig.y+orig.h-h;
+    if(dir.includes('w')) x = orig.x+orig.w-w;
+
+    if(shape.points){
+      const scaleX = w/orig.w, scaleY = h/orig.h;
+      shape.points = orig.points.map(pt=>({
+        x: x + (pt.x-orig.x)*scaleX,
+        y: y + (pt.y-orig.y)*scaleY
+      }));
+    } else {
+      shape.x=x; shape.y=y; shape.w=w; shape.h=h;
+    }
+  } else if(dragState.mode==='rotate'){
+    const angle = Math.atan2(p.y-dragState.cy, p.x-dragState.cx) * 180/Math.PI;
+    let newRotation = dragState.startRotation + (angle - dragState.startAngle);
+    if(e.shiftKey){ newRotation = Math.round(newRotation/15)*15; } // snap to 15°
+    shape.rotation = newRotation;
+  }
+
+  updateShapeDom(shape);
+  updateSelectionOverlay(shape);
+}
+
+function onWindowPointerUp(){
+  window.removeEventListener('pointermove', onWindowPointerMove);
+  window.removeEventListener('pointerup', onWindowPointerUp);
+  dragState = null;
+  clearSnapGuides();
+  render();
+}
+
+/* ================= Canvas extend (lengthen page below device size) ================= */
+let extendDragState = null;
+
+function onExtendPointerDown(e){
+  e.stopPropagation();
+  e.preventDefault();
+  const rect = artboardShell.getBoundingClientRect();
+  extendDragState = {
+    startClientY: e.clientY,
+    startH: canvas.h,
+    scaleY: canvas.h / rect.height,
+    historySaved: false
+  };
+  window.addEventListener('pointermove', onExtendPointerMove);
+  window.addEventListener('pointerup', onExtendPointerUp);
+}
+
+function onExtendPointerMove(e){
+  if(!extendDragState) return;
+  if(!extendDragState.historySaved){ pushHistory(); extendDragState.historySaved = true; }
+  const dy = (e.clientY - extendDragState.startClientY) * extendDragState.scaleY;
+  const minH = Math.max(MIN_CANVAS_H, canvas.foldY || 0);
+  canvas.h = Math.max(minH, Math.round(extendDragState.startH + dy));
+  applyCanvasSize();
+  render();
+}
+
+function onExtendPointerUp(){
+  window.removeEventListener('pointermove', onExtendPointerMove);
+  window.removeEventListener('pointerup', onExtendPointerUp);
+  extendDragState = null;
+}
+
+canvasExtendHandle.addEventListener('pointerdown', onExtendPointerDown);
+canvasExtendHandle.addEventListener('dblclick', (e)=>{
+  e.stopPropagation();
+  if(canvas.foldY && canvas.h !== canvas.foldY){
+    pushHistory();
+    canvas.h = canvas.foldY;
+    applyCanvasSize();
+    render();
+  }
+});
+
+/* ================= Pen tool ================= */
+let currentPenPoints = null;
+
+function startPenStroke(e){
+  const p = svgPoint(e);
+  currentPenPoints = [p];
+  window.addEventListener('pointermove', onPenMove);
+  window.addEventListener('pointerup', onPenUp);
+}
+function onPenMove(e){
+  if(!currentPenPoints) return;
+  currentPenPoints.push(svgPoint(e));
+  drawTempPath();
+}
+function drawTempPath(){
+  let temp = document.getElementById('tempPenPath');
+  if(!temp){
+    temp = document.createElementNS(SVG_NS,'path');
+    temp.id='tempPenPath';
+    temp.setAttribute('fill','none');
+    temp.setAttribute('stroke', rgba(DEFAULT_PEN_COLOR));
+    temp.setAttribute('stroke-width',4);
+    temp.setAttribute('stroke-linecap','round');
+    temp.setAttribute('stroke-linejoin','round');
+    artboard.appendChild(temp);
+  }
+  let d='';
+  currentPenPoints.forEach((p,i)=>{ d += (i===0?'M':'L')+p.x+' '+p.y+' '; });
+  temp.setAttribute('d', d);
+}
+function onPenUp(){
+  window.removeEventListener('pointermove', onPenMove);
+  window.removeEventListener('pointerup', onPenUp);
+  const temp = document.getElementById('tempPenPath');
+  if(temp) temp.remove();
+  if(currentPenPoints && currentPenPoints.length>1){
+    const bbox = pathBBox(currentPenPoints);
+    pushHistory();
+    shapes.push({ id: uid(), type:'path', points: currentPenPoints, color:{...DEFAULT_PEN_COLOR}, rotation:0, linkTo:null, ...bbox });
+  }
+  currentPenPoints = null;
+  render();
+}
+
+/* ================= Background (empty canvas) interaction ================= */
+artboard.addEventListener('pointerdown', (e)=>{
+  const isBackground = e.target === artboard || e.target.dataset.bg === "1";
+  if(!isBackground) return;
+
+  if(currentTool==='select'){
+    selectedId = null; render(); return;
+  }
+  if(currentTool==='rect' || currentTool==='triangle' || currentTool==='circle'){
+    startShapeDraw(e, currentTool); return;
+  }
+  if(currentTool==='text'){
+    const p = svgPoint(e);
+    createTextAt(p.x, p.y); return;
+  }
+  if(currentTool==='image'){
+    const p = svgPoint(e);
+    startImagePlacement(p.x, p.y); return;
+  }
+  if(currentTool==='pen'){
+    startPenStroke(e); return;
+  }
+  // eraser on empty background: nothing to do
+});
+
+/* ================= Tool panel ================= */
+function setDockOpen(open){
+  toolPanel.classList.toggle('open', open);
+  dockToggle.style.display = open ? 'none' : 'flex';
+}
+dockToggle.addEventListener('click', ()=>setDockOpen(true));
+dockCloseInner.addEventListener('click', (e)=>{ e.stopPropagation(); setDockOpen(false); });
+
+document.querySelectorAll('.tool-btn[data-tool]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentTool = btn.dataset.tool;
+    updateToolUI();
+  });
+});
+
+/* ================= Right panel actions ================= */
+document.getElementById('tabStyleBtn').addEventListener('click', ()=>setRightTab('style'));
+document.getElementById('tabLayoutBtn').addEventListener('click', ()=>setRightTab('layout'));
+
+document.getElementById('transformToggle').addEventListener('click', ()=>{
+  transformMode = !transformMode;
+  render();
+});
+document.getElementById('frontBtn').addEventListener('click', ()=>{
+  const s=getSelected(); if(!s) return;
+  const i = shapes.indexOf(s);
+  if(i<shapes.length-1){ pushHistory(); shapes.splice(i,1); shapes.splice(i+1,0,s); render(); }
+});
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  const s=getSelected(); if(!s) return;
+  const i = shapes.indexOf(s);
+  if(i>0){ pushHistory(); shapes.splice(i,1); shapes.splice(i-1,0,s); render(); }
+});
+document.getElementById('frontMostBtn').addEventListener('click', ()=>{
+  const s=getSelected(); if(!s) return;
+  pushHistory();
+  shapes.splice(shapes.indexOf(s),1); shapes.push(s); render();
+});
+document.getElementById('backMostBtn').addEventListener('click', ()=>{
+  const s=getSelected(); if(!s) return;
+  pushHistory();
+  shapes.splice(shapes.indexOf(s),1); shapes.unshift(s); render();
+});
+document.getElementById('deleteBtn').addEventListener('click', ()=>{
+  const s=getSelected(); if(!s) return;
+  pushHistory();
+  shapes = shapes.filter(x=>x.id!==s.id);
+  selectedId = null;
+  render();
+});
+
+/* One history snapshot per slider drag (taken on the first 'input' event
+   after the pointer goes down), not one per pixel of movement. Also
+   keeps the little numeric value label next to each slider in sync. */
+function attachSliderHistory(el, valueEl, applyFn){
+  let saved = false;
+  el.addEventListener('pointerdown', ()=>{ saved = false; });
+  el.addEventListener('input', (e)=>{
+    const s = getSelected(); if(!s) return;
+    if(!saved){ pushHistory(); saved = true; }
+    applyFn(s, e);
+    if(valueEl) valueEl.textContent = e.target.value;
+    render();
+  });
+}
+['r','g','b'].forEach(ch=>{
+  attachSliderHistory(
+    document.getElementById(ch+'Slider'),
+    document.getElementById(ch+'Value'),
+    (s,e)=>{ s.color[ch] = parseInt(e.target.value,10); }
+  );
+});
+attachSliderHistory(
+  document.getElementById('aSlider'),
+  document.getElementById('aValue'),
+  (s,e)=>{ s.color.a = parseInt(e.target.value,10)/100; }
+);
+
+/* ================= Top bar: dropdowns ================= */
+function toggleMenu(menuEl){
+  const isOpen = menuEl.style.display==='flex';
+  document.querySelectorAll('.dropdown').forEach(d=>d.style.display='none');
+  menuEl.style.display = isOpen ? 'none' : 'flex';
+}
+document.getElementById('fileBtn').addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(document.getElementById('fileMenu')); });
+document.getElementById('settingsBtn').addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(document.getElementById('settingsMenu')); });
+document.getElementById('pagesBtn').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  renderPagesList();
+  toggleMenu(document.getElementById('pagesMenu'));
+});
+document.getElementById('addPageBtn').addEventListener('click', (e)=>{ e.stopPropagation(); addNewPage(); });
+document.getElementById('deletePageBtn').addEventListener('click', (e)=>{ e.stopPropagation(); deleteCurrentPage(); });
+document.querySelectorAll('.dropdown').forEach(d=>d.addEventListener('click', e=>e.stopPropagation()));
+document.addEventListener('click', ()=>{ document.querySelectorAll('.dropdown').forEach(d=>d.style.display='none'); });
+
+/* Quick page prev/next buttons in the topbar, for moving between pages
+   without opening the ページ dropdown. */
+document.getElementById('pagePrevBtn').addEventListener('click', ()=>switchToPageOffset(-1));
+document.getElementById('pageNextBtn').addEventListener('click', ()=>switchToPageOffset(1));
+
+document.getElementById('deviceSelect').addEventListener('change',(e)=>{
+  const preset = DEVICE_PRESETS[e.target.value];
+  if(preset){
+    pushHistory();
+    canvas = {w:preset.w, h:preset.h, foldY: preset.h};
+  }
+  applyCanvasSize();
+  render();
+});
+
+document.getElementById('newBtn').addEventListener('click', ()=>{
+  const hasContent = shapes.length || pages.length>1;
+  if(hasContent && !confirm('現在の内容は削除されます。新規作成しますか？')) return;
+  shapes = [];
+  selectedId = null;
+  filename = 'index';
+  filenameInput.value = filename;
+  canvas = { w:900, h:600, foldY:null };
+  pageIdCounter = 1;
+  currentPageId = 1;
+  pages = [{ id:1, name:'index', canvas:{w:900,h:600,foldY:null}, shapes:[] }];
+  undoStack = [];
+  redoStack = [];
+  applyCanvasSize();
+  render();
+  renderPagesList();
+  updatePageNavLabel();
+});
+
+document.getElementById('undoBtn').addEventListener('click', undo);
+document.getElementById('redoBtn').addEventListener('click', redo);
+
+/* ================= Filename rename ================= */
+renameBtn.addEventListener('click', ()=>{
+  filenameInput.disabled = false;
+  filenameInput.focus();
+  filenameInput.select();
+});
+filenameInput.addEventListener('blur', commitFilename);
+filenameInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') filenameInput.blur(); });
+function commitFilename(){
+  const desired = sanitizePageName(filenameInput.value);
+  filename = uniquePageName(desired, currentPageId);
+  filenameInput.value = filename;
+  filenameInput.disabled = true;
+  syncCurrentPageIntoPages();
+  renderPagesList();
+  updatePageNavLabel();
+}
+
+/* =====================================================================
+   File I/O — implemented natively (no external libraries / no CDN),
+   so Save/Load works fully offline and reliably.
+   ===================================================================== */
+
+/* ---- raster helpers ---- */
+function rasterizeToCanvas(){
+  return new Promise((resolve,reject)=>{
+    const clone = artboard.cloneNode(true);
+    clone.querySelectorAll('.selection-overlay,.shape-preview,.fold-guide').forEach(n=>n.remove());
+    const temp = clone.querySelector('#tempPenPath'); if(temp) temp.remove();
+    clone.setAttribute('width', canvas.w);
+    clone.setAttribute('height', canvas.h);
+    const svgString = new XMLSerializer().serializeToString(clone);
+    const svgBlob = new Blob([svgString], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = ()=>{
+      const c = document.createElement('canvas');
+      c.width = canvas.w; c.height = canvas.h;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+      ctx.drawImage(img,0,0);
+      URL.revokeObjectURL(url);
+      resolve(c);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('画像の生成に失敗しました')); };
+    img.src = url;
+  });
+}
+function dataURLToBytes(dataUrl){
+  const base64 = dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  return bytes;
+}
+function downloadBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---- minimal PDF writer (embeds a single JPEG page, no libs needed) ---- */
+function buildMinimalPdf(jpegBytes, width, height){
+  const encoder = new TextEncoder();
+  const parts = [];
+  const offsets = {};
+  let pos = 0;
+  function push(chunk){
+    const bytes = typeof chunk === 'string' ? encoder.encode(chunk) : chunk;
+    parts.push(bytes);
+    pos += bytes.length;
+  }
+  push('%PDF-1.4\n');
+  offsets[1]=pos; push('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offsets[2]=pos; push('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  offsets[3]=pos; push(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+  offsets[4]=pos; push(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${width} /Height ${height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`);
+  push(jpegBytes);
+  push('\nendstream\nendobj\n');
+  const content = `q ${width} 0 0 ${height} 0 0 cm /Im0 Do Q`;
+  offsets[5]=pos; push(`5 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj\n`);
+  const xrefStart = pos;
+  push('xref\n0 6\n0000000000 65535 f \n');
+  for(let i=1;i<=5;i++){ push(String(offsets[i]).padStart(10,'0') + ' 00000 n \n'); }
+  push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
+  const total = parts.reduce((s,a)=>s+a.length,0);
+  const result = new Uint8Array(total);
+  let p=0; parts.forEach(a=>{ result.set(a,p); p+=a.length; });
+  return result;
+}
+
+/* ---- minimal ZIP writer / reader (store method only, no libs needed) ---- */
+const CRC_TABLE = (()=>{
+  const table = new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c = n;
+    for(let k=0;k<8;k++){ c = (c & 1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1); }
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+function crc32(bytes){
+  let crc = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++){ crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8); }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function buildZip(files){
+  const encoder = new TextEncoder();
+  const localParts = [], centralParts = [], localOffsets = [];
+  let offset = 0;
+  files.forEach(f=>{
+    const nameBytes = encoder.encode(f.name);
+    const data = f.data;
+    const crc = crc32(data);
+    const size = data.length;
+    const header = new Uint8Array(30 + nameBytes.length);
+    const dv = new DataView(header.buffer);
+    dv.setUint32(0, 0x04034b50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(6, 0, true);
+    dv.setUint16(8, 0, true);
+    dv.setUint16(10, 0, true);
+    dv.setUint16(12, 0, true);
+    dv.setUint32(14, crc, true);
+    dv.setUint32(18, size, true);
+    dv.setUint32(22, size, true);
+    dv.setUint16(26, nameBytes.length, true);
+    dv.setUint16(28, 0, true);
+    header.set(nameBytes, 30);
+    localOffsets.push(offset);
+    localParts.push(header, data);
+    offset += header.length + data.length;
+  });
+  let centralOffset = offset;
+  files.forEach((f,i)=>{
+    const nameBytes = encoder.encode(f.name);
+    const data = f.data;
+    const crc = crc32(data);
+    const size = data.length;
+    const central = new Uint8Array(46 + nameBytes.length);
+    const dv = new DataView(central.buffer);
+    dv.setUint32(0, 0x02014b50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(6, 20, true);
+    dv.setUint16(8, 0, true);
+    dv.setUint16(10, 0, true);
+    dv.setUint16(12, 0, true);
+    dv.setUint16(14, 0, true);
+    dv.setUint32(16, crc, true);
+    dv.setUint32(20, size, true);
+    dv.setUint32(24, size, true);
+    dv.setUint16(28, nameBytes.length, true);
+    dv.setUint16(30, 0, true);
+    dv.setUint16(32, 0, true);
+    dv.setUint16(34, 0, true);
+    dv.setUint16(36, 0, true);
+    dv.setUint32(38, 0, true);
+    dv.setUint32(42, localOffsets[i], true);
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+    offset += central.length;
+  });
+  const centralSize = offset - centralOffset;
+  const end = new Uint8Array(22);
+  const dvEnd = new DataView(end.buffer);
+  dvEnd.setUint32(0, 0x06054b50, true);
+  dvEnd.setUint16(4, 0, true);
+  dvEnd.setUint16(6, 0, true);
+  dvEnd.setUint16(8, files.length, true);
+  dvEnd.setUint16(10, files.length, true);
+  dvEnd.setUint32(12, centralSize, true);
+  dvEnd.setUint32(16, centralOffset, true);
+  dvEnd.setUint16(20, 0, true);
+  const all = [...localParts, ...centralParts, end];
+  const total = all.reduce((s,a)=>s+a.length,0);
+  const result = new Uint8Array(total);
+  let p=0; all.forEach(a=>{ result.set(a,p); p+=a.length; });
+  return result;
+}
+function parseZip(bytes){
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let eocdOffset = -1;
+  for(let i=bytes.length-22; i>=0; i--){
+    if(dv.getUint32(i,true)===0x06054b50){ eocdOffset=i; break; }
+  }
+  if(eocdOffset<0) throw new Error('ZIP形式が不正です');
+  const numEntries = dv.getUint16(eocdOffset+10, true);
+  const centralDirOffset = dv.getUint32(eocdOffset+16, true);
+  let ptr = centralDirOffset;
+  const files = {};
+  for(let i=0;i<numEntries;i++){
+    const sig = dv.getUint32(ptr,true);
+    if(sig!==0x02014b50) throw new Error('ZIP central directoryが破損しています');
+    const method = dv.getUint16(ptr+10, true);
+    const compSize = dv.getUint32(ptr+20, true);
+    const nameLen = dv.getUint16(ptr+28, true);
+    const extraLen = dv.getUint16(ptr+30, true);
+    const commentLen = dv.getUint16(ptr+32, true);
+    const localOffset = dv.getUint32(ptr+42, true);
+    const nameBytes = bytes.slice(ptr+46, ptr+46+nameLen);
+    const name = new TextDecoder().decode(nameBytes);
+    if(method !== 0){
+      throw new Error('圧縮されたZIPは未対応です（本アプリで保存したZIPのみ読み込み可能です）');
+    }
+    const lNameLen = dv.getUint16(localOffset+26, true);
+    const lExtraLen = dv.getUint16(localOffset+28, true);
+    const dataStart = localOffset + 30 + lNameLen + lExtraLen;
+    files[name] = bytes.slice(dataStart, dataStart+compSize);
+    ptr += 46 + nameLen + extraLen + commentLen;
+  }
+  return files;
+}
+
+/* ---- File menu actions ---- */
+document.getElementById('pdfSaveBtn').addEventListener('click', async ()=>{
+  try{
+    const canvasEl = await rasterizeToCanvas();
+    const jpegDataUrl = canvasEl.toDataURL('image/jpeg', 0.92);
+    const jpegBytes = dataURLToBytes(jpegDataUrl);
+    const pdfBytes = buildMinimalPdf(jpegBytes, canvas.w, canvas.h);
+    downloadBlob(new Blob([pdfBytes], {type:'application/pdf'}), filename + '.pdf');
+  }catch(err){
+    alert('PDF保存に失敗しました: ' + err.message);
+  }
+});
+
+document.getElementById('zipSaveBtn').addEventListener('click', async ()=>{
+  try{
+    syncCurrentPageIntoPages();
+    const canvasEl = await rasterizeToCanvas();
+    const pngBytes = dataURLToBytes(canvasEl.toDataURL('image/png'));
+    const jsonBytes = new TextEncoder().encode(JSON.stringify({canvas, shapes, pages, currentPageId}, null, 2));
+    const zipBytes = buildZip([
+      {name:'data.json', data: jsonBytes},
+      {name:'preview.png', data: pngBytes}
+    ]);
+    downloadBlob(new Blob([zipBytes], {type:'application/zip'}), filename + '.zip');
+  }catch(err){
+    alert('zip保存に失敗しました: ' + err.message);
+  }
+});
+
+document.getElementById('zipLoadInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const files = parseZip(buf);
+    if(!files['data.json']) throw new Error('data.jsonが見つかりません');
+    const text = new TextDecoder().decode(files['data.json']);
+    const parsed = JSON.parse(text);
+
+    if(Array.isArray(parsed.pages) && parsed.pages.length){
+      pages = parsed.pages;
+      pages.forEach(p=>{
+        if(p.canvas && p.canvas.foldY === undefined) p.canvas.foldY = null;
+        const migrated = [];
+        (p.shapes||[]).forEach(s=>{ migrateShape(s).forEach(m=>migrated.push(m)); });
+        p.shapes = migrated;
+      });
+      pageIdCounter = pages.reduce((m,p)=>Math.max(m,p.id||0), 0);
+      currentPageId = parsed.currentPageId && pages.some(p=>p.id===parsed.currentPageId)
+        ? parsed.currentPageId : pages[0].id;
+      const rec = pages.find(p=>p.id===currentPageId);
+      canvas = JSON.parse(JSON.stringify(rec.canvas));
+      shapes = JSON.parse(JSON.stringify(rec.shapes));
+      filename = rec.name;
+    } else {
+      // Backward compatibility: a single-page save from before multi-page support existed.
+      canvas = parsed.canvas || canvas;
+      if(canvas.foldY === undefined) canvas.foldY = null;
+      let rawShapes = parsed.shapes || [];
+      const migrated = [];
+      rawShapes.forEach(s=>{ migrateShape(s).forEach(m=>migrated.push(m)); });
+      shapes = migrated;
+      filename = sanitizePageName(file.name.replace(/\.zip$/i,''));
+      pageIdCounter = 1;
+      currentPageId = 1;
+      pages = [{ id:1, name: filename, canvas: JSON.parse(JSON.stringify(canvas)), shapes: JSON.parse(JSON.stringify(shapes)) }];
+    }
+
+    idCounter = shapes.reduce((m,s)=>Math.max(m,s.id||0), 0);
+    pages.forEach(p=>{ p.shapes.forEach(s=>{ idCounter = Math.max(idCounter, s.id||0); }); });
+    selectedId = null;
+    filenameInput.value = filename;
+    // Loading a project is like opening a fresh document: it shouldn't be
+    // possible to "undo" back into whatever was open before it.
+    undoStack = [];
+    redoStack = [];
+    applyCanvasSize();
+    render();
+    renderPagesList();
+    updatePageNavLabel();
+  }catch(err){
+    alert('読み込みに失敗しました: ' + err.message);
+  }
+  e.target.value = '';
+});
+
+/* ---- Code export: a standalone, self-contained *.html per page ----
+   Any shape with a `linkTo` becomes a real SVG <a href="name.html">
+   wrapper, so pages exported/copied together actually navigate to one
+   another when clicked (this works for rectangles, circles, text,
+   images, etc. — not just a dedicated "button" shape). */
+function wrapLinkedShapes(rootSvgEl, pageShapes){
+  pageShapes.filter(s=>s.linkTo).forEach(s=>{
+    const el = rootSvgEl.querySelector(`[data-id="${s.id}"]`);
+    if(el && el.parentNode){
+      const a = document.createElementNS(SVG_NS,'a');
+      a.setAttribute('href', s.linkTo + '.html');
+      a.style.cursor = 'pointer';
+      el.parentNode.insertBefore(a, el);
+      a.appendChild(el);
+    }
+  });
+}
+
+/* Small "move between pages" navigation bar injected into every
+   exported html file so people can jump straight between the exported
+   files (index.html, about.html, ...) without hosting them anywhere. */
+function buildPageNavBarHtml(allPages, currentName){
+  if(!allPages || allPages.length<2) return '';
+  const links = allPages.map(p=>{
+    if(p.name===currentName){
+      return `<span class="uis-nav-current">${p.name}</span>`;
+    }
+    return `<a class="uis-nav-link" href="${p.name}.html">${p.name}</a>`;
+  }).join('');
+  return `<nav class="uis-pagenav">${links}</nav>`;
+}
+const PAGE_NAV_BAR_CSS = `
+  .uis-pagenav{ position:fixed; left:0; right:0; bottom:0; display:flex; flex-wrap:wrap; gap:4px 10px;
+    align-items:center; justify-content:center; padding:8px 12px; background:rgba(26,29,41,.86);
+    font-family:sans-serif; font-size:12px; z-index:9999; }
+  .uis-pagenav a.uis-nav-link{ color:#fff; text-decoration:none; opacity:.8; }
+  .uis-pagenav a.uis-nav-link:hover{ opacity:1; text-decoration:underline; }
+  .uis-pagenav .uis-nav-current{ color:#84cae3; font-weight:700; }
+`;
+
+function buildPageHtml(pageName, pageCanvas, pageShapes){
+  const clone = artboard.cloneNode(true);
+  clone.querySelectorAll('.selection-overlay,.shape-preview,.fold-guide').forEach(n=>n.remove());
+  const temp = clone.querySelector('#tempPenPath'); if(temp) temp.remove();
+  clone.removeAttribute('id');
+  clone.setAttribute('width', pageCanvas.w);
+  clone.setAttribute('height', pageCanvas.h);
+  wrapLinkedShapes(clone, pageShapes);
+  const svgString = new XMLSerializer().serializeToString(clone);
+  const title = (pageName || 'untitled').replace(/[<>&]/g, '');
+  const navBar = buildPageNavBarHtml(pages, pageName);
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title>
+<style>
+  html, body{ margin:0; padding:0; background:#ffffff; }
+  svg{ display:block; width:100%; max-width:${pageCanvas.w}px; height:auto; margin:0 auto; }
+  a{ text-decoration:none; }
+${PAGE_NAV_BAR_CSS}
+</style>
+</head>
+<body>
+${svgString}
+${navBar}
+</body>
+</html>
+`;
+}
+
+/* Renders a page other than the current one into a throwaway, detached
+   SVG element (built with the same rendering rules as render()), so it
+   can be exported without disturbing the visible canvas. */
+function buildStaticSvgForPage(pageCanvas, pageShapes){
+  const svgEl = document.createElementNS(SVG_NS,'svg');
+  svgEl.setAttribute('width', pageCanvas.w);
+  svgEl.setAttribute('height', pageCanvas.h);
+  svgEl.setAttribute('viewBox', `0 0 ${pageCanvas.w} ${pageCanvas.h}`);
+  const bg = document.createElementNS(SVG_NS,'rect');
+  bg.setAttribute('x',0); bg.setAttribute('y',0);
+  bg.setAttribute('width',pageCanvas.w); bg.setAttribute('height',pageCanvas.h);
+  bg.setAttribute('fill','#ffffff');
+  svgEl.appendChild(bg);
+
+  pageShapes.forEach(shape=>{
+    let el; const c = shape.color;
+    if(shape.type==='rect'){
+      el = document.createElementNS(SVG_NS,'path');
+      el.setAttribute('d', buildRectPathD(shape));
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='triangle'){
+      el = document.createElementNS(SVG_NS,'polygon');
+      el.setAttribute('points', shape.points.map(p=>`${p.x},${p.y}`).join(' '));
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='circle'){
+      el = document.createElementNS(SVG_NS,'ellipse');
+      el.setAttribute('cx', shape.x+shape.w/2); el.setAttribute('cy', shape.y+shape.h/2);
+      el.setAttribute('rx', shape.w/2); el.setAttribute('ry', shape.h/2);
+      el.setAttribute('fill', rgba(c));
+    } else if(shape.type==='text'){
+      el = document.createElementNS(SVG_NS,'text');
+      el.setAttribute('x', shape.x); el.setAttribute('y', shape.y);
+      el.setAttribute('font-size', Math.max(10, shape.h*0.6));
+      el.setAttribute('font-weight','700');
+      el.setAttribute('dominant-baseline','hanging');
+      el.setAttribute('fill', rgba(c));
+      el.textContent = shape.text;
+    } else if(shape.type==='path'){
+      el = document.createElementNS(SVG_NS,'path');
+      let d = ''; shape.points.forEach((p,i)=>{ d += (i===0?'M':'L') + p.x + ' ' + p.y + ' '; });
+      el.setAttribute('d', d);
+      el.setAttribute('fill','none'); el.setAttribute('stroke', rgba(c));
+      el.setAttribute('stroke-width',4); el.setAttribute('stroke-linecap','round'); el.setAttribute('stroke-linejoin','round');
+    } else if(shape.type==='image'){
+      el = document.createElementNS(SVG_NS,'image');
+      el.setAttribute('x', shape.x); el.setAttribute('y', shape.y);
+      el.setAttribute('width', shape.w); el.setAttribute('height', shape.h);
+      el.setAttributeNS('http://www.w3.org/1999/xlink','href', shape.src);
+      el.setAttribute('href', shape.src);
+    }
+    if(!el) return;
+    el.dataset.id = shape.id;
+    applyShapeTransform(el, shape);
+    svgEl.appendChild(el);
+  });
+  return svgEl;
+}
+
+function buildExportedHtml(){
+  return buildPageHtml(filename, canvas, shapes);
+}
+
+document.getElementById('exportCodeBtn').addEventListener('click', ()=>{
+  try{
+    const html = buildExportedHtml();
+    downloadBlob(new Blob([html], {type:'text/html'}), (filename||'index') + '.html');
+  }catch(err){
+    alert('コード出力に失敗しました: ' + err.message);
+  }
+});
+
+document.getElementById('exportAllPagesBtn').addEventListener('click', ()=>{
+  try{
+    syncCurrentPageIntoPages();
+    const files = pages.map(p=>{
+      let html;
+      if(p.id === currentPageId){
+        html = buildPageHtml(p.name, p.canvas, p.shapes);
+      } else {
+        const svgEl = buildStaticSvgForPage(p.canvas, p.shapes);
+        wrapLinkedShapes(svgEl, p.shapes);
+        const svgString = new XMLSerializer().serializeToString(svgEl);
+        const title = (p.name || 'untitled').replace(/[<>&]/g, '');
+        const navBar = buildPageNavBarHtml(pages, p.name);
+        html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title>
+<style>
+  html, body{ margin:0; padding:0; background:#ffffff; }
+  svg{ display:block; width:100%; max-width:${p.canvas.w}px; height:auto; margin:0 auto; }
+  a{ text-decoration:none; }
+${PAGE_NAV_BAR_CSS}
+</style>
+</head>
+<body>
+${svgString}
+${navBar}
+</body>
+</html>
+`;
+      }
+      return { name: p.name + '.html', data: new TextEncoder().encode(html) };
+    });
+    const zipBytes = buildZip(files);
+    downloadBlob(new Blob([zipBytes], {type:'application/zip'}), (filename||'site') + '_pages.zip');
+  }catch(err){
+    alert('書き出しに失敗しました: ' + err.message);
+  }
+});
+
+/* ---- Copy code to clipboard (with a fallback for non-secure contexts / older browsers) ---- */
+async function copyTextToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try{
+      await navigator.clipboard.writeText(text);
+      return;
+    }catch(err){
+      // fall through to the legacy method below
+    }
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '-1000px';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(err){ ok = false; }
+  document.body.removeChild(ta);
+  if(!ok) throw new Error('クリップボードへのコピーに対応していません');
+}
+
+function flashButtonLabel(btn, tempText, duration=1400){
+  if(btn.dataset.flashing) return; // avoid stacking timers on rapid clicks
+  const original = btn.textContent;
+  btn.dataset.flashing = '1';
+  btn.textContent = tempText;
+  setTimeout(()=>{
+    btn.textContent = original;
+    delete btn.dataset.flashing;
+  }, duration);
+}
+
+document.getElementById('copyCodeBtn').addEventListener('click', async (e)=>{
+  const btn = e.currentTarget;
+  try{
+    const html = buildExportedHtml();
+    await copyTextToClipboard(html);
+    flashButtonLabel(btn, 'コピーしました！');
+  }catch(err){
+    alert('コピーに失敗しました: ' + err.message);
+  }
+});
+
+/* ================= Keyboard shortcuts ================= */
+window.addEventListener('keydown',(e)=>{
+  const activeTag = document.activeElement && document.activeElement.tagName;
+  const isEditableFocus = activeTag === 'INPUT' || activeTag === 'TEXTAREA';
+
+  const ctrlOrCmd = e.ctrlKey || e.metaKey;
+
+  // Undo / Redo / Copy / Paste — skipped while a text field has focus so
+  // the browser's own native text-editing shortcuts take priority there.
+  if(ctrlOrCmd && !isEditableFocus){
+    const key = e.key.toLowerCase();
+    if(key === 'z' && e.shiftKey){ e.preventDefault(); redo(); return; }   // Ctrl+Shift+Z
+    if(key === 'z'){ e.preventDefault(); undo(); return; }                  // Ctrl+Z
+    if(key === 'y'){ e.preventDefault(); redo(); return; }                  // Ctrl+Y
+    if(key === 'c'){ e.preventDefault(); copySelected(); return; }          // Ctrl+C
+    if(key === 'v'){ e.preventDefault(); pasteClipboard(); return; }        // Ctrl+V
+  }
+
+  if(isEditableFocus) return; // let normal text editing happen uninterrupted
+
+  if((e.key==='Delete' || e.key==='Backspace') && selectedId!==null){
+    pushHistory();
+    shapes = shapes.filter(s=>s.id!==selectedId);
+    selectedId = null;
+    render();
+  }
+});
+
+/* ================= Init ================= */
+applyCanvasSize();
+render();
+renderPagesList();
+updatePageNavLabel();
+</script>
+</body>
+</html>
